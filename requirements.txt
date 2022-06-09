@@ -1,7 +1,7 @@
 streamlit
 math
 numpy
-scipy.optimize import fsolve
+scipy.optimize
 matplotlib.pyplot
 pandas
 PIL
