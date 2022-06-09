@@ -24,7 +24,7 @@ def app():
         if (Telectro < 60):
             Telectro = 60
         st.session_state['Telectro'] = Telectro
-        st.write('Temperatura do Separador Eletrostático'+Telectro)
+        st.write('Temperatura do Separador Eletrostático'+str("{:.0f}".format(Telectro)))
 
 
 
