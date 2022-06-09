@@ -14,7 +14,7 @@ def app():
     st.title('Matriz de Resultados')
     st.header('Tabela de Casos:')
 
-    data = pd.DataFrame(columns=["Caso","Número de Poços","Capacidade da planta","VPL"])
+    data = pd.DataFrame(columns=["Número de Poços","Capacidade da planta","VPL", "Risco"])
 
     # with every interaction, the script runs from top to bottom
     # resulting in the empty dataframe
@@ -22,7 +22,7 @@ def app():
         data = st.session_state['data']
         data.index.rename('foo', inplace=True)
     else:
-        data = pd.DataFrame(columns=["Caso","Número de Poços","Capacidade da planta","VPL"])
+        data = pd.DataFrame(columns=["Número de Poços","Capacidade da planta","VPL","Risco"])
         data.index.rename('foo', inplace=True)
 
     if 'n' in st.session_state:
@@ -40,10 +40,14 @@ def app():
     else:
         vpl = None
 
+    if 'riskvar' in st.session_state:
+        riskvar = st.session_state['riskvar']
+    else:
+        riskvar = None
+
     if st.button("Registrar caso"):
         # update dataframe state
-        row2 = [1,n,oilprodp,vpl]
-        data2 = pd.DataFrame([[1,n,oilprodp,vpl]], columns=['Caso', 'Número de Poços', 'Capacidade da planta', 'VPL'])
+        data2 = pd.DataFrame([[n,oilprodp,vpl,riskvar]], columns=['Número de Poços', 'Capacidade da planta', 'VPL','Risco'])
         datafinal = pd.concat([data,data2],ignore_index=True)
         for key in st.session_state.keys():
             del st.session_state[key]
