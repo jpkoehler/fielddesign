@@ -3,7 +3,7 @@ import streamlit as st
 
 # Custom imports
 from multipage import MultiPage
-from pages import reservoir_flow, oilproperties, equipment, layout, wells, subsea, results, risk # import your pages here
+from pages import reservoir_flow, oilproperties, equipment, layout, wells, subsea, results, risk, SMS # import your pages here
 
 # Create an instance of the app
 app = MultiPage()
@@ -21,6 +21,7 @@ app.add_page("Planta de Processo - Arranjo", layout.app)
 app.add_page("Poços", wells.app)
 app.add_page("Subsea", subsea.app)
 app.add_page("Análise de Risco", risk.app)
+app.add_page("SMS", SMS.app)
 app.add_page("Resultados", results.app)
 
 
