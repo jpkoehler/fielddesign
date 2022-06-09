@@ -134,6 +134,8 @@ def app():
         data = [newIP, qi, newPsep, newPe, newrgo]
         df = pd.DataFrame(data, columns=wells, index=["IP", "Oil Production (bpd)","Psep (bar)","Pe (bar)","RGO (sm³/sm³)"])
         st.dataframe(df.style.format("{:.0f}"))
+        st.session_state['dfreservoir'] = df
+        st.session_state['wells'] = wells
         st.write("Produção total é de "+str("{:.0f}".format(prodtotal))+" bpd")
         day = [*range(0, 10951, 1)]
         # bpd
