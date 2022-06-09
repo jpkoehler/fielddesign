@@ -1,10 +1,10 @@
-import streamlit as st
-import math
-import numpy as np
-import numpy
-from scipy.optimize import fsolve
-import matplotlib.pyplot as plt
-import pandas as pd
-from PIL import Image
-from multipage import MultiPage
-from pages import reservoir_flow, oilproperties, equipment, layout, wells, subsea, results
+streamlit as st
+math
+numpy as np
+numpy
+scipy.optimize import fsolve
+matplotlib.pyplot as plt
+pandas as pd
+PIL import Image
+multipage import MultiPage
+pages import reservoir_flow, oilproperties, equipment, layout, wells, subsea, results
