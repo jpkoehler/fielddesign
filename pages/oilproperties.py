@@ -5,7 +5,6 @@ import numpy
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 import pandas as pd
-from persist import persist, load_widget_state
 
 def app():
     st.title('Propriedades do Óleo')
