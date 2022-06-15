@@ -9,8 +9,6 @@ from pages import reservoir_flow, oilproperties, equipment, layout, wells, subse
 app = MultiPage()
 
 # Title of the main page
-image = Image.open('logo_branco.png')
-st.image(image)
 st.title("Field Design")
 
 # Add all your applications (pages) here
