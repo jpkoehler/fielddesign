@@ -14,7 +14,7 @@ def app():
     st.header('Mapeamento de poços:')
 
     st.write(
-        f'<iframe src="https://spillmanager.riopetroleo.com/", width="800" height="800"></iframe>',
+        f'<iframe src="https://spillmanager.riopetroleo.com/mapaproto.html", width="800" height="800"></iframe>',
         unsafe_allow_html=True,
     )
 
