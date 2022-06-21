@@ -16,15 +16,31 @@ def app():
     else:
         oilprodp = 15000
 
+    if 'MM' in st.session_state:
+        MM = st.session_state['MM']
+    else:
+        MM = 25
+
+    if 'ROl' in st.session_state:
+        ROl = st.session_state['ROl']
+    else:
+        ROl = 800
+
+    if 'Tc' in st.session_state:
+        Tc = st.session_state['Tc']
+    else:
+        Tc = 252
+
+    if 'Pc' in st.session_state:
+        Pc = st.session_state['Pc']
+    else:
+        Pc = 47
+
     qprodp = st.number_input('Capacidade da planta (STB/d):', 1, 1000000, oilprodp)
     st.session_state['oilprodp'] = qprodp
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
     Pexp = st.number_input('Pressão de exportação (bar):', 1, 1000, 300)
-    MM = st.number_input('Massa Molar do Gás (kg/kmol):', 1, 500, 25)
-    ROl = st.number_input('Massa específica do líquido (kg/m³):', 1, 2000, 800)
-    Tc = st.number_input('Temperatura crítica (K):', 1, 2000, 252)
-    Pc = st.number_input('Pressão crítica (bar):', 1, 2000, 47)
 
     button = st.button('Dimensionar planta')
     #dividir por 2 , como trem precisa ser feito
@@ -40,7 +56,7 @@ def app():
         if 'prodtotal' in st.session_state:
             prodtotal = st.session_state['prodtotal']
         else:
-            prodtotal = 100000
+            prodtotal = 30000
 
         if 'rgofinal' in st.session_state:
             RGO = st.session_state['rgofinal']
@@ -58,6 +74,7 @@ def app():
         day = [*range(0, 10951, 1)]
 
         tp = (1 / b) * ((oilprod0 / oilprodp) - 1)
+        st.session_state['tp'] = tp
         oilprodplateau1 = []
         oilprod = []
 
@@ -86,14 +103,6 @@ def app():
 
         vpl = ((1 - R) * (1 - T) * (vpn * p)) - capexn - capexp - capexs
         st.session_state['vpl'] = vpl
-        st.write(f'O VPN é {vpn}.')
-        st.write(f'O CAPEX para o navio é {capexn}.')
-        st.write(f'O CAPEX para os poços é de {capexp}.')
-        st.write(f'O CAPEX para arranjo subsea é {capexs}.')
-        st.write(f'O VPL é {vpl}.')
-
-
-
 
         ql = qprodp * 0.0001104861  #m³/min
         trtrifasico = 10
@@ -110,21 +119,15 @@ def app():
         Leletro = Deletro * 4
         Hflotador = Dtrifasico * 5
         ciclonumber = (math.ceil((qprodp * 0.006629)/5))/2
-        flux = Image.open('fluxograma.png')
-        st.image(flux)
-        st.write("O diâmetro do separador trifásico é " + str("{:.2f}".format(Dtrifasico)) + " m.")
-        st.write("O comprimento do separador trifásico é " + str("{:.2f}".format(Ltrifasico)) + " m.")
-        st.write("O diâmetro dos separadores bifásicos é " + str("{:.2f}".format(Dbifasico)) + " m.")
-        st.write("O comprimento dos separadores bifásicos é " + str("{:.2f}".format(Lbifasico)) + " m.")
-        st.write("O diâmetro do separador eletrostático é " + str("{:.2f}".format(Deletro)) + " m.")
-        st.write("O comprimento do separador eletrostático é " + str("{:.2f}".format(Leletro)) + " m.")
-        st.write("O número de hidrociclones do separador trifásico são " + str(ciclonumber))
+
+
+        st.write("O número de hidrociclones do separador trifásico são " + ("{:.0f}".format(ciclonumber)))
 
         gasprod = oilprodp * RGO
         nestag = math.ceil(math.log(Pexp/Psep)/math.log(4))
         st.write("O sistema de compressão possui "+str(nestag)+" estágios.")
         razcomp = (Pexp / Psep) ** (1 / nestag)
-        st.write("O sistema de compressão possui razão de compressão de " + str(razcomp) + ".")
+        st.write("O sistema de compressão possui razão de compressão de " + ("{:.2f}".format(razcomp)) + ".")
 
         if (nestag == 3):
 
@@ -151,8 +154,7 @@ def app():
             qv = gasprod * 0.0000018414 #m³/s
             Aknock1 = qv / vmax
             Dknock1 = 1 * math.sqrt((4 * Aknock1) / math.pi)
-            st.write("Área do knockout 1 é " + str("{:.2f}".format(Aknock1)) + " m².")
-            st.write("Diâmetro do Knockout 1 é " + str("{:.2f}".format(Dknock1)) + " m.")
+
 
             #Compressor1
             Pcomp1 = Psep * razcomp
@@ -178,8 +180,7 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T1 * (((Pcomp1 / Psep) ** ((K - 1) / K)) - 1)
             Pot1 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 1 é " + str("{:.0f}".format(Td1)) + " K.")
-            st.write("Potência do compressor 1 é " + str("{:.0f}".format(Pot1)) + " KW.")
+
 
             #Resfriador1
             Tci = 293.15  # K
@@ -233,8 +234,7 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc1 = (Q / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 1 é " + str("{:.0f}".format(Atroc1)) + " m².")
-            st.write("A carga térmica do resfriador 1 é " + str("{:.0f}".format(Q)) + " W.")
+
 
             # Knockout2
             T2 = 313.15  # K
@@ -259,8 +259,7 @@ def app():
             qv = gasprod * 0.0000018414  # m³/s
             Aknock2 = qv / vmax
             Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
-            st.write("Área do knockout 2 é " + str("{:.2f}".format(Aknock2)) + " m².")
-            st.write("Diâmetro do Knockout 2 é " + str("{:.2f}".format(Dknock2)) + " m.")
+
 
             # Compressor2
             Pcomp2 = P2 * razcomp
@@ -286,8 +285,7 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((K - 1) / K)) - 1)
             Pot2 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 2 é " + str("{:.0f}".format(Td2)) + " K.")
-            st.write("Potência do compressor 2 é " + str("{:.0f}".format(Pot2)) + " KW.")
+
 
             # Resfriador2
             Tci = 293.15  # K
@@ -342,8 +340,7 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc2 = (Q2 / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 2 é " + str("{:.0f}".format(Atroc2)) + " m².")
-            st.write("A carga térmica do resfriador 2 é " + str("{:.0f}".format(Q2)) + " W.")
+
 
             # Knockout3
             T3 = 313.15  # K
@@ -368,8 +365,7 @@ def app():
             qv = gasprod * 0.0000018414  # m³/s
             Aknock3 = qv / vmax
             Dknock3 = 1 * math.sqrt((4 * Aknock3) / math.pi)
-            st.write("Área do knockout 3 é " + str("{:.2f}".format(Aknock3)) + " m².")
-            st.write("Diâmetro do Knockout 3 é " + str("{:.2f}".format(Dknock3)) + " m.")
+
 
             # Compressor3
             Pcomp3 = P3 * razcomp
@@ -395,8 +391,7 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((K - 1) / K)) - 1)
             Pot3 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 3 é " + str("{:.0f}".format(Td3)) + " K.")
-            st.write("Potência do compressor 3 é " + str("{:.0f}".format(Pot3)) + " KW.")
+
 
             # Resfriador3
             Tci = 293.15  # K
@@ -451,8 +446,7 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc3 = (Q3 / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 3 é " + str("{:.0f}".format(Atroc3)) + " m².")
-            st.write("A carga térmica do resfriador 3 é " + str("{:.0f}".format(Q3)) + " W.")
+
 
         elif (nestag == 4):
 
@@ -479,8 +473,7 @@ def app():
             qv = gasprod * 0.0000018414 #m³/s
             Aknock1 = qv / vmax
             Dknock1 = 1 * math.sqrt((4 * Aknock1) / math.pi)
-            st.write("Área do knockout 1 é " + str("{:.2f}".format(Aknock1)) + " m².")
-            st.write("Diâmetro do Knockout 1 é " + str("{:.2f}".format(Dknock1)) + " m.")
+
 
             #Compressor1
             Pcomp1 = Psep * razcomp
@@ -506,8 +499,7 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T1 * (((Pcomp1 / Psep) ** ((K - 1) / K)) - 1)
             Pot1 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 1 é " + str("{:.0f}".format(Td1)) + " K.")
-            st.write("Potência do compressor 1 é " + str("{:.0f}".format(Pot1)) + " KW.")
+
 
             #Resfriador1
             Tci = 293.15  # K
@@ -561,8 +553,6 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc1 = (Q / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 1 é " + str("{:.0f}".format(Atroc1)) + " m².")
-            st.write("A carga térmica do resfriador 1 é " + str("{:.0f}".format(Q)) + " W.")
 
             # Knockout2
             T2 = 313.15  # K
@@ -587,8 +577,7 @@ def app():
             qv = gasprod * 0.0000018414  # m³/s
             Aknock2 = qv / vmax
             Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
-            st.write("Área do knockout 2 é " + str("{:.2f}".format(Aknock2)) + " m².")
-            st.write("Diâmetro do Knockout 2 é " + str("{:.2f}".format(Dknock2)) + " m.")
+
 
             # Compressor2
             Pcomp2 = P2 * razcomp
@@ -614,8 +603,7 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((K - 1) / K)) - 1)
             Pot2 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 2 é " + str("{:.0f}".format(Td2)) + " K.")
-            st.write("Potência do compressor 2 é " + str("{:.0f}".format(Pot2)) + " KW.")
+
 
             # Resfriador2
             Tci = 293.15  # K
@@ -779,8 +767,7 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc3 = (Q3 / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 3 é " + str("{:.0f}".format(Atroc3)) + " m².")
-            st.write("A carga térmica do resfriador 3 é " + str("{:.0f}".format(Q3)) + " W.")
+
 
             # Knockout4
             T4 = 313.15  # K
@@ -805,8 +792,7 @@ def app():
             qv = gasprod * 0.0000018414  # m³/s
             Aknock4 = qv / vmax
             Dknock4 = 1 * math.sqrt((4 * Aknock4) / math.pi)
-            st.write("Área do knockout 4 é " + str("{:.2f}".format(Aknock4)) + " m².")
-            st.write("Diâmetro do Knockout 4 é " + str("{:.2f}".format(Dknock4)) + " m.")
+
 
             # Compressor4
             Pcomp4 = P4 * razcomp
@@ -832,8 +818,7 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T3 * (((Pcomp4 / Pcomp3) ** ((K - 1) / K)) - 1)
             Pot4 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 4 é " + str("{:.0f}".format(Td4)) + " K.")
-            st.write("Potência do compressor 4 é " + str("{:.0f}".format(Pot4)) + " KW.")
+
 
             # Resfriador4
             Tci = 293.15  # K
@@ -888,9 +873,33 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc4 = (Q4 / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 4 é " + str("{:.0f}".format(Atroc4)) + " m².")
-            st.write("A carga térmica do resfriador 4 é " + str("{:.0f}".format(Q4)) + " W.")
 
+
+        datasep = pd.DataFrame(
+            [["Separador Trifásico", Ltrifasico, Dtrifasico], ["Separador Bifásico", Lbifasico, Dbifasico],["Separador Eletrostático", Leletro, Deletro],["Flotador", Hflotador, Dtrifasico]],
+            columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)'])
+        st.dataframe(datasep)
+
+        dataknock = pd.DataFrame(
+            [["Vaso de Knockout 1", Aknock1, Dknock1], ["Vaso de Knockout 2", Aknock2, Dknock2],
+             ["Vaso de Knockout 3", Aknock3, Dknock3]],
+            columns=['Equipamento', 'Área (m²)', 'Diâmetro (m)'])
+        st.dataframe(dataknock)
+
+        datacomp = pd.DataFrame(
+            [["Compressor 1", Pot1], ["Compressor 2", Pot2],
+             ["Compressor 3", Pot3]],
+            columns=['Equipamento', 'Potência (KW)'])
+        st.dataframe(datacomp)
+
+        dataresf = pd.DataFrame(
+            [["Resfriador 1", Q, Atroc1], ["Resfriador 2", Q2, Atroc2],
+             ["Resfriador 3", Q3, Atroc3]],
+            columns=['Equipamento',"Carga Térmica (W)", 'Área de Troca Térmica (m²)'])
+        st.dataframe(dataresf)
+
+        flux = Image.open('fluxograma.png')
+        st.image(flux)
 
 
 

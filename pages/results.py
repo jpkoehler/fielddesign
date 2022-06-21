@@ -92,18 +92,21 @@ def app():
         data2 = pd.DataFrame([[n,oilprodp,vpl,riskvar]], columns=['Número de Poços', 'Capacidade da planta', 'VPL','Risco'])
         datafinal = pd.concat([data,data2],ignore_index=True)
 
-        pdf = PDF()
-        pdf.alias_nb_pages()
-        pdf.add_page()
-        pdf.set_font('Times', '', 12)
-
         fig, ax = plt.subplots(figsize=(12, 4))
         ax.axis('tight')
         ax.axis('off')
         the_table = ax.table(cellText=dfreservoir.values, colLabels=dfreservoir.columns, loc='center')
         plt.savefig('table.png', dpi=200, bbox_inches='tight')
+
+        pdf = PDF()
+        pdf.alias_nb_pages()
+        pdf.add_page()
+        pdf.set_font('Times', '', 12)
+
+        pdf.cell(0, 10, 'Resultados de Reservatório e Escoamento:', 0, 1)
+        pdf.image('table.png', x=None, y=None, w=200, h=100, type='', link='')
         pdf.output('Relatório - Caso X.pdf', 'F')
-        show_pdf('Relatório - Caso X.pdf')
+        #show_pdf('Relatório - Caso X.pdf')
 
         for key in st.session_state.keys():
             del st.session_state[key]

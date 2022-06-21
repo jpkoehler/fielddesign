@@ -18,6 +18,19 @@ def app():
         unsafe_allow_html=True,
     )
 
+    if st.button("Registrar Batimetria"):
+        st.success("Batimetria registrada com sucesso!")
+        st.write("Batimetria da Flowline 1:")
+        bat1 = Image.open('Batimetria1.png')
+        st.image(bat1)
+        st.write("Batimetria da Flowline 2:")
+        bat2 = Image.open('Batimetria2.png')
+        st.image(bat2)
+        st.write("Batimetria da Flowline 3:")
+        bat3 = Image.open('Batimetria3.png')
+        st.image(bat3)
+
+
 
 
 

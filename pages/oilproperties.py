@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def app():
-    st.title('Propriedades do Óleo')
+    st.title('Propriedades do Petróleo')
     st.header('Dados de Entrada:')
 
     if 'api' in st.session_state:
@@ -15,8 +15,33 @@ def app():
     else:
         api = 35
 
+    if 'MM' in st.session_state:
+        MM = st.session_state['MM']
+    else:
+        MM = 25
+
+    if 'ROl' in st.session_state:
+        ROl = st.session_state['ROl']
+    else:
+        ROl = 800
+
+    if 'Tc' in st.session_state:
+        Tc = st.session_state['Tc']
+    else:
+        Tc = 252
+
+    if 'Pc' in st.session_state:
+        Pc = st.session_state['Pc']
+    else:
+        Pc = 47
+
     api = st.number_input('Grau API do óleo:', 1, 1000000, api)
     st.session_state['api'] = api
+
+    MM = st.number_input('Massa Molar do Gás (kg/kmol):', 1, 500, MM)
+    ROl = st.number_input('Massa específica do líquido (kg/m³):', 1, 2000, ROl)
+    Tc = st.number_input('Temperatura crítica (K):', 1, 2000, Tc)
+    Pc = st.number_input('Pressão crítica (bar):', 1, 2000, Pc)
 
     if st.button('Salvar'):
         st.success("Salvo com sucesso!")

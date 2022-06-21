@@ -5,6 +5,8 @@ import numpy
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
 
 def app():
@@ -134,6 +136,8 @@ def app():
         data = [newIP, qi, newPsep, newPe, newrgo]
         df = pd.DataFrame(data, columns=wells, index=["IP", "Oil Production (bpd)","Psep (bar)","Pe (bar)","RGO (sm³/sm³)"])
         st.dataframe(df.style.format("{:.0f}"))
+
+        st.session_state['rgofinal'] = rgofinal
         st.session_state['dfreservoir'] = df
         st.session_state['wells'] = wells
         st.write("Produção total é de "+str("{:.0f}".format(prodtotal))+" bpd")
