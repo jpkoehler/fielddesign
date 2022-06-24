@@ -35,13 +35,17 @@ def app():
     else:
         Pc = 47
 
-    api = st.number_input('Grau API do óleo:', 1, 1000000, api)
-    st.session_state['api'] = api
+    col1, col2 = st.columns(2)
 
-    MM = st.number_input('Massa Molar do Gás (kg/kmol):', 1, 500, MM)
-    ROl = st.number_input('Massa específica do líquido (kg/m³):', 1, 2000, ROl)
-    Tc = st.number_input('Temperatura crítica (K):', 1, 2000, Tc)
-    Pc = st.number_input('Pressão crítica (bar):', 1, 2000, Pc)
+    with col1:
+
+        api = st.number_input('Grau API do óleo:', 1, 1000000, api)
+        st.session_state['api'] = api
+
+        MM = st.number_input('Massa Molar do Gás (kg/kmol):', 1, 500, MM)
+        ROl = st.number_input('Massa específica do líquido (kg/m³):', 1, 2000, ROl)
+        Tc = st.number_input('Temperatura crítica (K):', 1, 2000, Tc)
+        Pc = st.number_input('Pressão crítica (bar):', 1, 2000, Pc)
 
     if st.button('Salvar'):
         st.success("Salvo com sucesso!")

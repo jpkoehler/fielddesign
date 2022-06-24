@@ -1,3 +1,6 @@
+import base64
+import time
+
 import streamlit as st
 import math
 from PIL import Image
@@ -11,10 +14,16 @@ def app():
     st.title('Planta de Processo')
     st.header('Dado de Entrada')
 
+    def show_pdf(file_path):
+        with open(file_path, "rb") as f:
+            base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="800" height="800" type="application/pdf"></iframe>'
+        st.markdown(pdf_display, unsafe_allow_html=True)
+
     if 'oilprodp' in st.session_state:
         oilprodp = st.session_state['oilprodp']
     else:
-        oilprodp = 15000
+        oilprodp = 150000
 
     if 'MM' in st.session_state:
         MM = st.session_state['MM']
@@ -41,12 +50,23 @@ def app():
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
     Pexp = st.number_input('Pressão de exportação (bar):', 1, 1000, 300)
+    st.write("Processos adicionais:")
+    CO2 = st.checkbox("CO2")
+    H2S = st.checkbox("H2S")
+    lavagem = st.checkbox("Lavagem de óleo")
 
-    button = st.button('Dimensionar planta')
+    button1 = st.button('Dimensionar planta')
     #dividir por 2 , como trem precisa ser feito
+    if st.session_state.get('button1') != True:
+        st.session_state['button1'] = button1
+
+    if (button1):
+        with st.spinner('Processando...'):
+            time.sleep(2)
+        st.success('Sucesso!')
 
 
-    if (button):
+    if st.session_state['button1'] == True:
 
         if 'n' in st.session_state:
             n = st.session_state['n']
@@ -56,7 +76,7 @@ def app():
         if 'prodtotal' in st.session_state:
             prodtotal = st.session_state['prodtotal']
         else:
-            prodtotal = 30000
+            prodtotal = 180000
 
         if 'rgofinal' in st.session_state:
             RGO = st.session_state['rgofinal']
@@ -120,14 +140,9 @@ def app():
         Hflotador = Dtrifasico * 5
         ciclonumber = (math.ceil((qprodp * 0.006629)/5))/2
 
-
-        st.write("O número de hidrociclones do separador trifásico são " + ("{:.0f}".format(ciclonumber)))
-
         gasprod = oilprodp * RGO
         nestag = math.ceil(math.log(Pexp/Psep)/math.log(4))
-        st.write("O sistema de compressão possui "+str(nestag)+" estágios.")
         razcomp = (Pexp / Psep) ** (1 / nestag)
-        st.write("O sistema de compressão possui razão de compressão de " + ("{:.2f}".format(razcomp)) + ".")
 
         if (nestag == 3):
 
@@ -876,30 +891,55 @@ def app():
 
 
         datasep = pd.DataFrame(
-            [["Separador Trifásico", Ltrifasico, Dtrifasico], ["Separador Bifásico", Lbifasico, Dbifasico],["Separador Eletrostático", Leletro, Deletro],["Flotador", Hflotador, Dtrifasico]],
+            [["Separador Trifásico", str("{:.2f}".format(Ltrifasico)), str("{:.2f}".format(Dtrifasico))], ["Separador Bifásico", str("{:.2f}".format(Lbifasico)), str("{:.2f}".format(Dbifasico))],["Separador Eletrostático", str("{:.2f}".format(Leletro)), str("{:.2f}".format(Deletro))],["Flotador", str("{:.2f}".format(Hflotador)), str("{:.2f}".format(Dtrifasico))]],
             columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)'])
-        st.dataframe(datasep)
+        st.table(datasep)
 
         dataknock = pd.DataFrame(
-            [["Vaso de Knockout 1", Aknock1, Dknock1], ["Vaso de Knockout 2", Aknock2, Dknock2],
-             ["Vaso de Knockout 3", Aknock3, Dknock3]],
+            [["Vaso de Knockout 1", str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
+             ["Vaso de Knockout 3", str("{:.2f}".format(Aknock3)), str("{:.2f}".format(Dknock3))]],
             columns=['Equipamento', 'Área (m²)', 'Diâmetro (m)'])
-        st.dataframe(dataknock)
+        st.table(dataknock)
 
         datacomp = pd.DataFrame(
-            [["Compressor 1", Pot1], ["Compressor 2", Pot2],
-             ["Compressor 3", Pot3]],
+            [["Compressor 1", str("{:.2f}".format(Pot1))], ["Compressor 2", str("{:.2f}".format(Pot2))],
+             ["Compressor 3", str("{:.2f}".format(Pot3))]],
             columns=['Equipamento', 'Potência (KW)'])
-        st.dataframe(datacomp)
+        st.table(datacomp)
 
         dataresf = pd.DataFrame(
-            [["Resfriador 1", Q, Atroc1], ["Resfriador 2", Q2, Atroc2],
-             ["Resfriador 3", Q3, Atroc3]],
-            columns=['Equipamento',"Carga Térmica (W)", 'Área de Troca Térmica (m²)'])
-        st.dataframe(dataresf)
+            [["Resfriador 1", str("{:.2f}".format(Q/1e6)), str("{:.2f}".format(Atroc1))], ["Resfriador 2", str("{:.2f}".format(Q2/1e6)), str("{:.2f}".format(Atroc2))],
+             ["Resfriador 3", str("{:.2f}".format(Q3/1e6)), str("{:.2f}".format(Atroc3))]],
+            columns=['Equipamento',"Carga Térmica (MW)", 'Área de Troca Térmica (m²)'])
+        st.table(dataresf)
+
+        dataciclo = pd.DataFrame(
+            [["Hidrociclone do Separador Trifásico", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))],
+             ["Hidrociclone do Separador Eletrostático", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))]],
+            columns=['Equipamento', "Diâmetro (m)", 'Comprimento (m)',"Quantidade"])
+        st.table(dataciclo)
 
         flux = Image.open('fluxograma.png')
         st.image(flux)
+
+        if st.button('Abrir Separador de Teste'):
+            show_pdf('testseparator.pdf')
+        if st.button('Abrir Cooler de Gás Separado'):
+            show_pdf('sepgascooler.pdf')
+        if st.button('Abrir Estágios de Compressão'):
+            show_pdf('compstages.pdf')
+        if st.button('Abrir Controle de Compressor'):
+            show_pdf('compcontrol.pdf')
+        if st.button('Abrir Compressão Principal'):
+            show_pdf('maingascomp.pdf')
+        if st.button('Abrir Compressor de Exportação'):
+            show_pdf('exporgascomp.pdf')
+        if st.button('Abrir Coalescedor'):
+            show_pdf('coalescent.pdf')
+        if st.button('Abrir Sistema de Tratamento de Gás'):
+            show_pdf('gasdesid.pdf')
+        if st.button('Abrir Hidrociclone'):
+            show_pdf('hidrociclone.pdf')
 
 
 
