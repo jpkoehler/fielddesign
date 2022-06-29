@@ -14,9 +14,9 @@ st.title("Field Design")
 utl.local_css("style.css")
 
 # Add all your applications (pages) here
-app.add_page("Propriedades do Petróleo", oilproperties.app)
+app.add_page("Características do Projeto", oilproperties.app)
 app.add_page("Reservatório e Escoamento", reservoir_flow.app)
-app.add_page("Subsea", subsea.app)
+app.add_page("Subsea e Naval", subsea.app)
 app.add_page("Poços", wells.app)
 app.add_page("Planta de Processo - Equipamentos", equipment.app)
 app.add_page("Planta de Processo - Arranjo", layout.app)
