@@ -28,7 +28,7 @@ def app():
     else:
         riskvar = 0
 
-    riskno = st.number_input('Risco',1,10,1)
+    riskno = st.number_input('Nível de Risco',1,10,1)
     risktext = st.text_input('Comentário')
 
 

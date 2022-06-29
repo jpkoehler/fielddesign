@@ -7,8 +7,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def app():
-    st.title('Propriedades do Petróleo')
-    st.header('Dados de Entrada:')
+    st.title('Características do Projeto')
+    st.header('Projeto:')
+
+    projoptions = ["Greenfield", "Brownfield", "Tieback"]
+    uepoptions = ["FPSO Spread Mooring", "FPSO Turret", "SPAR","SS","TLP"]
+    contratoptions = ["Própria","Afretada"]
+
+    projselect = st.radio('Projeto:', projoptions, key="proj")
+    uepselect = st.radio('Modelo de UEP:', uepoptions, key="uep")
+    contratoselect = st.radio('Modelo de Contrato:', contratoptions, key="contrato")
+
+    st.header('Características do Petróleo:')
 
     if 'api' in st.session_state:
         api = st.session_state['api']

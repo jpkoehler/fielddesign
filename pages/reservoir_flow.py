@@ -14,7 +14,7 @@ def app():
     st.header('Dados de entrada')
 
     st.write(
-        f'<iframe src="https://spillmanager.riopetroleo.com/mapaproto.html", width="800" height="800"></iframe>',
+        f'<iframe src="https://spillmanager.riopetroleo.com/mapaproto.html?a=0", width="800" height="800"></iframe>',
         unsafe_allow_html=True,
     )
 
@@ -33,10 +33,10 @@ def app():
     if 'n' in st.session_state:
         n = st.session_state['n']
     else:
-        n = 3
+        n = 6
 
 
-    n = st.number_input('Número de poços:', 1, 10, n)
+    n = st.number_input('Número de poços produtores:', 1, 10, n)
     st.session_state['n'] = n
 
 
@@ -145,6 +145,43 @@ def app():
 
     prodtotal = 0
     rgofinal = 0
+
+    if 'inj' in st.session_state:
+        inj = st.session_state['inj']
+    else:
+        inj = 0
+
+
+    inj = st.number_input('Número de poços injetores:', 0, 10, inj)
+    st.session_state['inj'] = inj
+
+    if (inj >= 1):
+
+
+        newinjdepth = []
+        newDininj = []
+
+        colsp = st.columns(inj)
+
+        if 'injdepth' in st.session_state:
+            injdepth = st.session_state['injdepth'][:inj]
+            while (len(injdepth) < inj):
+                injdepth.append(300)
+        else:
+            injdepth = [300 for i in range(inj)]
+
+
+        for i, x in enumerate(colsp):
+            inputinjdepth = st.number_input(f'Profundidade injeção {i + 1}:', 0, 20000, injdepth[i])
+            newinjdepth.append(inputinjdepth)
+            inputDininj = st.radio(f'Diâmetro interno injeção {i + 1}:', Doptions)
+            newDininj.append(inputDininj)
+        st.session_state['injdepth'] = newinjdepth
+        st.session_state['Dininj'] = newDininj
+
+    wellsinj=[]
+    injquantity = []
+
     if st.button('Solver', key ="buttonsolver"):
         for i in range(0,n,1):
             qi.append(solversingle(K, newIP[i], newPsep[i], newPe[i]))
@@ -155,6 +192,15 @@ def app():
         data = [newIP, qi, newPsep, newPe, newrgo]
         df = pd.DataFrame(data, columns=wells, index=["IP", "Oil Production (bpd)","Psep (bar)","Pe (bar)","RGO (sm³/sm³)"])
         st.dataframe(df.style.format("{:.0f}"))
+        if (inj >=1):
+            injperwell = prodtotal/inj
+            for i in range(0,inj,1):
+                wellsinj.append(f'Injection Well{i + 1}')
+                injquantity.append(injperwell)
+
+            datainj = [injquantity]
+            dfinj = pd.DataFrame(datainj, columns=wellsinj, index=["Water Injection(bpd)"])
+            st.dataframe(dfinj.style.format("{:.0f}"))
 
         st.session_state['rgofinal'] = rgofinal
         st.session_state['dfreservoir'] = df
@@ -185,7 +231,7 @@ def app():
 
         st.pyplot(fig)
 
-    st.button('Solver integrado ao layout submarino')
+
 
 
 

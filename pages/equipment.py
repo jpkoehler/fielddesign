@@ -23,7 +23,7 @@ def app():
     if 'oilprodp' in st.session_state:
         oilprodp = st.session_state['oilprodp']
     else:
-        oilprodp = 150000
+        oilprodp = 90000
 
     if 'MM' in st.session_state:
         MM = st.session_state['MM']
@@ -76,7 +76,7 @@ def app():
         if 'prodtotal' in st.session_state:
             prodtotal = st.session_state['prodtotal']
         else:
-            prodtotal = 180000
+            prodtotal = 130000
 
         if 'rgofinal' in st.session_state:
             RGO = st.session_state['rgofinal']
@@ -919,11 +919,18 @@ def app():
             columns=['Equipamento', "Diâmetro (m)", 'Comprimento (m)',"Quantidade"])
         st.table(dataciclo)
 
-        flux = Image.open('fluxograma.png')
-        st.image(flux)
+        if (CO2 == True):
+            flux = Image.open('fluxograma3.png')
+            st.image(flux)
+        else:
+            flux = Image.open('fluxograma.png')
+            st.image(flux)
+
+
+
 
         if st.button('Abrir Separador de Teste'):
-            show_pdf('testseparator.pdf')
+            show_pdf('fluxogramapfd.pdf')
         if st.button('Abrir Cooler de Gás Separado'):
             show_pdf('sepgascooler.pdf')
         if st.button('Abrir Estágios de Compressão'):
