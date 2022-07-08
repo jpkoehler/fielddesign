@@ -28,8 +28,13 @@ def app():
     else:
         riskvar = 0
 
+    if 'risktext' in st.session_state:
+        risktext = st.session_state['risktext']
+    else:
+        risktext = ""
+
     riskno = st.number_input('Nível de Risco',1,10,1)
-    risktext = st.text_input('Comentário')
+    risktext = st.text_input('Comentário',risktext)
 
 
     if st.button("Registrar"):

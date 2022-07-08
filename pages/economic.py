@@ -59,7 +59,7 @@ def app():
 
         vpl = ((1 - R) * (1 - T) * (vpn * p)) - capexn - capexp - capexs
 
-        econpd = pd.DataFrame([[f'US${str("{:.0f}".format(vpn/1e6))} milhões', f'US${str("{:.0f}".format(capexn/1e6))} milhões',f'US${str("{:.0f}".format(capexp/1e6))} milhões',f'US${str("{:.0f}".format(capexs/1e6))} milhões',f'US${str("{:.0f}".format(vpl/1e6))} milhões']], columns=["VPN","Capex do Navio","Capex dos Poços", "Capex do Subsea","VPL"])
+        econpd = pd.DataFrame([[f'{str("{:.0f}".format(vpn/1e6))} milhões', f'US${str("{:.0f}".format(capexn/1e6))} milhões',f'US${str("{:.0f}".format(capexp/1e6))} milhões',f'US${str("{:.0f}".format(capexs/1e6))} milhões',f'US${str("{:.0f}".format(vpl/1e6))} milhões']], columns=["VPN","Capex do Navio","Capex dos Poços", "Capex do Subsea","VPL"])
         st.dataframe(econpd)
         st.session_state['vpl'] = vpl
 

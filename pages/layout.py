@@ -57,7 +57,7 @@ def app():
         if st.button('Abrir Desidratação de Gás e Gás Combustível'):
             show_pdf('I-DE-3010.90-1415-942-PPC-001_C - Desidratação de Gás e Gás Combustível.pdf')
         if st.button('Abrir Compressão Principal'):
-            show_pdf('arranjonew.pdf')
+            show_pdf('arranjocompleto.pdf')
         if st.button('Abrir Injeção de Gás'):
             show_pdf('I-DE-3010.90-1417-942-PPC-001_B - Injeção de Gás.pdf')
         if st.button('Abrir Tratamento de Óleo'):

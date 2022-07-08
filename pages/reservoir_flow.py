@@ -191,7 +191,7 @@ def app():
             rgofinal = rgofinal + newrgo[i] * (qi[i] / prodtotal)
         data = [newIP, qi, newPsep, newPe, newrgo]
         df = pd.DataFrame(data, columns=wells, index=["IP", "Oil Production (bpd)","Psep (bar)","Pe (bar)","RGO (sm³/sm³)"])
-        st.dataframe(df.style.format("{:.0f}"))
+        st.table(df.style.format("{:.0f}"))
         if (inj >=1):
             injperwell = prodtotal/inj
             for i in range(0,inj,1):
@@ -200,7 +200,7 @@ def app():
 
             datainj = [injquantity]
             dfinj = pd.DataFrame(datainj, columns=wellsinj, index=["Water Injection(bpd)"])
-            st.dataframe(dfinj.style.format("{:.0f}"))
+            st.table(dfinj.style.format("{:.0f}"))
 
         st.session_state['rgofinal'] = rgofinal
         st.session_state['dfreservoir'] = df

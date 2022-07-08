@@ -59,11 +59,11 @@ def app():
 
     if st.button('Salvar'):
         st.success("Salvo com sucesso!")
-        Telectro = (0.0012 * (api) ** 3 ) - (0.024 * (api) ** 2) - (6.6052 * (api)) + 237.72
-        if (Telectro < 60):
-            Telectro = 60
-        st.session_state['Telectro'] = Telectro
-        st.write('Temperatura do Separador Eletrostático'+str("{:.0f}".format(Telectro)))
+        Teletro = (0.0012 * (api) ** 3 ) - (0.024 * (api) ** 2) - (6.6052 * (api)) + 237.72
+        if (Teletro < 60):
+            Teletro = 60
+        st.session_state['Teletro'] = Teletro
+
 
 
 

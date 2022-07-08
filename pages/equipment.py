@@ -83,6 +83,11 @@ def app():
         else:
             RGO = 46
 
+        if 'Teletro' in st.session_state:
+            Teletro = st.session_state['Teletro']
+        else:
+            Teletro = 60
+
         oilprod0 = prodtotal
         tf = 10950  # dias
         i = 0.09  # anual
@@ -889,10 +894,16 @@ def app():
             Atroc4 = (Q4 / (DTLM * U)) * 1.1
 
 
+        Ttrifasico =30
+        Tbifasico = Teletro
+        Tflotador = 25
 
         datasep = pd.DataFrame(
-            [["Separador Trifásico", str("{:.2f}".format(Ltrifasico)), str("{:.2f}".format(Dtrifasico))], ["Separador Bifásico", str("{:.2f}".format(Lbifasico)), str("{:.2f}".format(Dbifasico))],["Separador Eletrostático", str("{:.2f}".format(Leletro)), str("{:.2f}".format(Deletro))],["Flotador", str("{:.2f}".format(Hflotador)), str("{:.2f}".format(Dtrifasico))]],
-            columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)'])
+            [["Separador Trifásico", str("{:.2f}".format(Ltrifasico)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Ttrifasico))],
+             ["Separador Bifásico", str("{:.2f}".format(Lbifasico)), str("{:.2f}".format(Dbifasico)),str("{:.0f}".format(Tbifasico))],
+             ["Tratador Eletrostático", str("{:.2f}".format(Leletro)), str("{:.2f}".format(Deletro)),str("{:.0f}".format(Teletro))],
+             ["Flotador", str("{:.2f}".format(Hflotador)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Tflotador))]],
+            columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)','Temperatura (°C)'])
         st.table(datasep)
 
         dataknock = pd.DataFrame(
