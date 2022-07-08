@@ -36,7 +36,7 @@ def app():
     if 'econpd' in st.session_state:
         econpd = st.session_state['econpd']
     else:
-        econpd = pd.DataFrame(columns=["VPN","Capex do Navio","Capex dos Poços", "Capex do Subsea","VPL"])
+        econpd = pd.DataFrame(columns=["VPN (Barris)","Capex do Navio","Capex dos Poços", "Capex do Subsea","VPL"])
 
 
     i = st.number_input('Taxa Mínima de Atratividade (%)',0.0,1.0,0.09,0.01)
