@@ -29,7 +29,7 @@ def app():
     else:
         tp = 8000
 
-    econpd = pd.DataFrame(columns=["VPN","Capex do Navio","Capex dos Poços", "Capex do Subsea","VPL"])
+    econpd = pd.DataFrame(columns=["VPN (Barris)","Capex do Navio","Capex dos Poços", "Capex do Subsea","VPL"])
 
     # with every interaction, the script runs from top to bottom
     # resulting in the empty dataframe
