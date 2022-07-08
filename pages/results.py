@@ -89,7 +89,7 @@ def app():
 
     if st.button("Registrar caso"):
         # update dataframe state
-        data2 = pd.DataFrame([[n,oilprodp,f'US${str("{:.0f}".format(vpl/1e6))} milhões',riskvar]], columns=['Número de Poços', 'Capacidade da planta', 'VPL','Risco'])
+        data2 = pd.DataFrame([[n,f'{str("{:.0f}".format(oilprodp))} STB/d',f'US${str("{:.0f}".format(vpl/1e6))} milhões',riskvar]], columns=['Número de Poços', 'Capacidade da planta', 'VPL','Risco'])
         datafinal = pd.concat([data,data2],ignore_index=True)
 
         fig, ax = plt.subplots(figsize=(12, 4))
