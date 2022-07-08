@@ -941,23 +941,32 @@ def app():
 
 
         if st.button('Abrir Separador de Teste'):
-            show_pdf('fluxogramapfd.pdf')
+            flux = Image.open('fluxogramapfd-1.png')
+            st.image(flux)
         if st.button('Abrir Cooler de Gás Separado'):
-            show_pdf('sepgascooler.pdf')
+            flux = Image.open('fluxogramapfd-1.png')
+            st.image(flux)
         if st.button('Abrir Estágios de Compressão'):
-            show_pdf('compstages.pdf')
+            flux = Image.open('compstages-1.png')
+            st.image(flux)
         if st.button('Abrir Controle de Compressor'):
-            show_pdf('compcontrol.pdf')
+            flux = Image.open('compcontrol-1.png')
+            st.image(flux)
         if st.button('Abrir Compressão Principal'):
-            show_pdf('maingascomp.pdf')
+            flux = Image.open('maingascomp-1.png')
+            st.image(flux)
         if st.button('Abrir Compressor de Exportação'):
-            show_pdf('exporgascomp.pdf')
+            flux = Image.open('exporgascomp-1.png')
+            st.image(flux)
         if st.button('Abrir Coalescedor'):
-            show_pdf('coalescent.pdf')
+            flux = Image.open('coalescent-1.png')
+            st.image(flux)
         if st.button('Abrir Sistema de Tratamento de Gás'):
-            show_pdf('gasdesid.pdf')
+            flux = Image.open('gasdesid-1.png')
+            st.image(flux)
         if st.button('Abrir Hidrociclone'):
-            show_pdf('hidrociclone.pdf')
+            flux = Image.open('hidrociclone-1.png')
+            st.image(flux)
 
 
 
