@@ -50,8 +50,8 @@ def app():
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
     Pexp = st.number_input('Pressão de exportação (bar):', 1, 1000, 300)
-    C1 = st.number_input('Fração molar de C1:', 0, 1, 0,step=1.,format="%.2f")
-    C2 = st.number_input('Fração molar de C2:', 0, 1, 0)
+    C1 = st.number_input('Fração molar de C1:', 0., 1., 0.))
+    C2 = st.number_input('Fração molar de C2:', 0., 1., 0.)
     C3 = st.number_input('Fração molar de C3:', 0, 1, 0)
     iC4 = st.number_input('Fração molar de i-C4:', 0, 1, 0)
     nC4 = st.number_input('Fração molar de n-C4:', 0, 1, 0)
