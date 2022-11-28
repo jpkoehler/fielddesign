@@ -25,35 +25,49 @@ def app():
     else:
         oilprodp = 90000
 
-    if 'MM' in st.session_state:
-        MM = st.session_state['MM']
-    else:
-        MM = 25
+    #if 'MM' in st.session_state:
+    #    MM = st.session_state['MM']
+    #else:
+    #    MM = 25
 
-    if 'ROl' in st.session_state:
-        ROl = st.session_state['ROl']
-    else:
-        ROl = 800
+    #if 'ROl' in st.session_state:
+    #    ROl = st.session_state['ROl']
+    #else:
+    #    ROl = 800
 
-    if 'Tc' in st.session_state:
-        Tc = st.session_state['Tc']
-    else:
-        Tc = 252
+    #if 'Tc' in st.session_state:
+    #    Tc = st.session_state['Tc']
+    #else:
+    #    Tc = 252
 
-    if 'Pc' in st.session_state:
-        Pc = st.session_state['Pc']
-    else:
-        Pc = 47
+    #if 'Pc' in st.session_state:
+    #    Pc = st.session_state['Pc']
+    #else:
+    #    Pc = 47
 
     qprodp = st.number_input('Capacidade da planta (STB/d):', 1, 1000000, oilprodp)
     st.session_state['oilprodp'] = qprodp
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
     Pexp = st.number_input('Pressão de exportação (bar):', 1, 1000, 300)
-    st.write("Processos adicionais:")
-    CO2 = st.checkbox("CO2")
-    H2S = st.checkbox("H2S")
-    lavagem = st.checkbox("Lavagem de óleo")
+    C1 = st.number_input('Fração molar de C1:', 0, 1, 0.01)
+    C2 = st.number_input('Fração molar de C2:', 0, 1, 0.01)
+    C3 = st.number_input('Fração molar de C3:', 0, 1, 0.01)
+    iC4 = st.number_input('Fração molar de i-C4:', 0, 1, 0.01)
+    nC4 = st.number_input('Fração molar de n-C4:', 0, 1, 0.01)
+    iC5 = st.number_input('Fração molar de i-C5:', 0, 1, 0.01)
+    nC5 = st.number_input('Fração molar de n-C5:', 0, 1, 0.01)
+    nC6 = st.number_input('Fração molar de n-C6:', 0, 1, 0.01)
+    nC7 = st.number_input('Fração molar de n-C7:', 0, 1, 0.01)
+    nC8 = st.number_input('Fração molar de n-C8:', 0, 1, 0.01)
+    n2 = st.number_input('Fração molar de n2:', 0, 1, 0.01)
+    co2 = st.number_input('Fração molar de CO2:', 0, 1, 0.01)
+    h2s = st.number_input('Fração molar de H2S:', 0, 1, 0.01)
+    h2o = st.number_input('Fração molar de H2O:', 0, 1, 0.01)
+    #st.write("Processos adicionais:")
+    #CO2 = st.checkbox("CO2")
+    #H2S = st.checkbox("H2S")
+    #lavagem = st.checkbox("Lavagem de óleo")
 
     button1 = st.button('Dimensionar planta')
     #dividir por 2 , como trem precisa ser feito
@@ -89,6 +103,10 @@ def app():
             Teletro = 60
 
         oilprod0 = prodtotal
+        MM = C1*16.04 + C2*30.07 + C3*44.1 + iC4*58.12 + nC4*58.12 + iC5*72.15 + nC5*72.15 + nC6*86.18 + nC7*100.21 + nC8*114.23 + n2*28.014 + co2*44.01 + h2s*34.1 + h2o*18.01
+        Tc = C1*190.58 + C2*305.42 + C3*369.82 + iC4*408.14 + nC4*425.18 + iC5*692 + nC5*469.65 + nC6*507.43 + nC7*540.26 + nC8*568.83 + n2*126.10 + co2*304.19 + h2s*373.55 + h2o*647.13
+        Pc = C1*46.04 + C2*48.80 + C3*42.49 + iC4*36.48 + nC4*37.97 + iC5*35.60 + nC5*33.69 + nC6*30.12 + nC7*27.36 + nC8*24.86 + n2*33.94 + co2*73.82 + h2s*90.08 + h2o*220.55
+        ROl = 800
         tf = 10950  # dias
         i = 0.09  # anual
         b = 0.2 / 365
@@ -112,12 +130,12 @@ def app():
             else:
                 oilprodplateau1.append(oilprodp)
 
-        fig, ax = plt.subplots()
-        ax.plot(day, oilprod, label="Original")
-        ax.plot(day, oilprodplateau1, label="Patamar")
-        ax.legend()
+        #fig, ax = plt.subplots()
+        #ax.plot(day, oilprod, label="Original")
+        #ax.plot(day, oilprodplateau1, label="Patamar")
+        #ax.legend()
 
-        st.pyplot(fig)
+        #st.pyplot(fig)
 
         vpn = oilprodp * 365 * (((1 - numpy.exp(-i * tp)) / i) + (
                 ((numpy.exp(-i * tp)) - (numpy.exp((-(b + i) * tf) + b * tp))) / (b + i)))
@@ -678,8 +696,8 @@ def app():
             # Cálculo da área de Troca Térmica
             Atroc2 = (Q2 / (DTLM * U)) * 1.1
 
-            st.write("Área de troca térmica do resfriador 2 é " + str("{:.0f}".format(Atroc2)) + " m².")
-            st.write("A carga térmica do resfriador 2 é " + str("{:.0f}".format(Q2)) + " W.")
+            #st.write("Área de troca térmica do resfriador 2 é " + str("{:.0f}".format(Atroc2)) + " m².")
+            #st.write("A carga térmica do resfriador 2 é " + str("{:.0f}".format(Q2)) + " W.")
 
             # Knockout3
             T3 = 313.15  # K
@@ -704,8 +722,8 @@ def app():
             qv = gasprod * 0.0000018414  # m³/s
             Aknock3 = qv / vmax
             Dknock3 = 1 * math.sqrt((4 * Aknock3) / math.pi)
-            st.write("Área do knockout 3 é " + str("{:.2f}".format(Aknock3)) + " m².")
-            st.write("Diâmetro do Knockout 3 é " + str("{:.2f}".format(Dknock3)) + " m.")
+            #st.write("Área do knockout 3 é " + str("{:.2f}".format(Aknock3)) + " m².")
+            #st.write("Diâmetro do Knockout 3 é " + str("{:.2f}".format(Dknock3)) + " m.")
 
             # Compressor3
             Pcomp3 = P3 * razcomp
@@ -731,8 +749,8 @@ def app():
             Hisen = Z * R * (K / (K - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((K - 1) / K)) - 1)
             Pot3 = (Hisen * M) / (nisen * nmec * 3600)
 
-            st.write("T de descarga do compressor 3 é " + str("{:.0f}".format(Td3)) + " K.")
-            st.write("Potência do compressor 3 é " + str("{:.0f}".format(Pot3)) + " KW.")
+            #st.write("T de descarga do compressor 3 é " + str("{:.0f}".format(Td3)) + " K.")
+            #st.write("Potência do compressor 3 é " + str("{:.0f}".format(Pot3)) + " KW.")
 
             # Resfriador3
             Tci = 293.15  # K
@@ -898,13 +916,13 @@ def app():
         Tbifasico = Teletro
         Tflotador = 25
 
-        datasep = pd.DataFrame(
-            [["Separador Trifásico", str("{:.2f}".format(Ltrifasico)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Ttrifasico))],
-             ["Separador Bifásico", str("{:.2f}".format(Lbifasico)), str("{:.2f}".format(Dbifasico)),str("{:.0f}".format(Tbifasico))],
-             ["Tratador Eletrostático", str("{:.2f}".format(Leletro)), str("{:.2f}".format(Deletro)),str("{:.0f}".format(Teletro))],
-             ["Flotador", str("{:.2f}".format(Hflotador)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Tflotador))]],
-            columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)','Temperatura (°C)'])
-        st.table(datasep)
+        #datasep = pd.DataFrame(
+        #   [["Separador Trifásico", str("{:.2f}".format(Ltrifasico)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Ttrifasico))],
+        #    ["Separador Bifásico", str("{:.2f}".format(Lbifasico)), str("{:.2f}".format(Dbifasico)),str("{:.0f}".format(Tbifasico))],
+        #    ["Tratador Eletrostático", str("{:.2f}".format(Leletro)), str("{:.2f}".format(Deletro)),str("{:.0f}".format(Teletro))],
+        #    ["Flotador", str("{:.2f}".format(Hflotador)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Tflotador))]],
+        #   columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)','Temperatura (°C)'])
+        #st.table(datasep)
 
         dataknock = pd.DataFrame(
             [["Vaso de Knockout 1", str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
@@ -924,58 +942,49 @@ def app():
             columns=['Equipamento',"Carga Térmica (MW)", 'Área de Troca Térmica (m²)'])
         st.table(dataresf)
 
-        dataciclo = pd.DataFrame(
-            [["Hidrociclone do Separador Trifásico", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))],
-             ["Hidrociclone do Separador Eletrostático", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))]],
-            columns=['Equipamento', "Diâmetro (m)", 'Comprimento (m)',"Quantidade"])
-        st.table(dataciclo)
+        #dataciclo = pd.DataFrame(
+        #     [["Hidrociclone do Separador Trifásico", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))],
+        #      ["Hidrociclone do Separador Eletrostático", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))]],
+        #     columns=['Equipamento', "Diâmetro (m)", 'Comprimento (m)',"Quantidade"])
+        #st.table(dataciclo)
 
-        if (CO2 == True):
-            flux = Image.open('fluxograma3.png')
-            st.image(flux)
-        else:
-            flux = Image.open('fluxograma.png')
-            st.image(flux)
-
-
-
-
-        if st.button('Abrir Separador de Teste'):
-            flux = Image.open('fluxogramapfd-1.png')
-            st.image(flux)
-        if st.button('Abrir Cooler de Gás Separado'):
-            flux = Image.open('fluxogramapfd-1.png')
-            st.image(flux)
-        if st.button('Abrir Estágios de Compressão'):
-            flux = Image.open('compstages-1.png')
-            st.image(flux)
-        if st.button('Abrir Controle de Compressor'):
-            flux = Image.open('compcontrol-1.png')
-            st.image(flux)
-        if st.button('Abrir Compressão Principal'):
-            flux = Image.open('maingascomp-1.png')
-            st.image(flux)
-        if st.button('Abrir Compressor de Exportação'):
-            flux = Image.open('exporgascomp-1.png')
-            st.image(flux)
-        if st.button('Abrir Coalescedor'):
-            flux = Image.open('coalescent-1.png')
-            st.image(flux)
-        if st.button('Abrir Sistema de Tratamento de Gás'):
-            flux = Image.open('gasdesid-1.png')
-            st.image(flux)
-        if st.button('Abrir Hidrociclone'):
-            flux = Image.open('hidrociclone-1.png')
-            st.image(flux)
+        #if (CO2 == True):
+        #    flux = Image.open('fluxograma3.png')
+        #    st.image(flux)
+        #else:
+        #    flux = Image.open('fluxograma.png')
+        #    st.image(flux)
 
 
 
 
-
-
-
-
-
+        #if st.button('Abrir Separador de Teste'):
+        #    flux = Image.open('fluxogramapfd-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Cooler de Gás Separado'):
+        #    flux = Image.open('fluxogramapfd-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Estágios de Compressão'):
+        #    flux = Image.open('compstages-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Controle de Compressor'):
+        #    flux = Image.open('compcontrol-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Compressão Principal'):
+        #    flux = Image.open('maingascomp-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Compressor de Exportação'):
+        #    flux = Image.open('exporgascomp-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Coalescedor'):
+        #    flux = Image.open('coalescent-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Sistema de Tratamento de Gás'):
+        #    flux = Image.open('gasdesid-1.png')
+        #    st.image(flux)
+        #if st.button('Abrir Hidrociclone'):
+        #    flux = Image.open('hidrociclone-1.png')
+        #    st.image(flux)
 
 
 
