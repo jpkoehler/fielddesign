@@ -925,9 +925,9 @@ def app():
         #st.table(datasep)
 
         dataknock = pd.DataFrame(
-            [["Vaso de Knockout 1", str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
-             ["Vaso de Knockout 3", str("{:.2f}".format(Aknock3)), str("{:.2f}".format(Dknock3))]],
-            columns=['Equipamento', 'Área (m²)', 'Diâmetro (m)'])
+            [["Vaso de Knockout 1", str("{:.2f}".format(P1)),str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(P2)),str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
+             ["Vaso de Knockout 3",str("{:.2f}".format(P3)), str("{:.2f}".format(Aknock3)), str("{:.2f}".format(Dknock3))]],
+            columns=['Equipamento','Pressão Nominal (bar)' 'Área (m²)', 'Diâmetro (m)'])
         st.table(dataknock)
 
         datacomp = pd.DataFrame(
