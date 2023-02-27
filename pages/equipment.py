@@ -24,6 +24,11 @@ def app():
         oilprodp = st.session_state['oilprodp']
     else:
         oilprodp = 90000
+        
+    if 'rgofinal' in st.session_state:
+        RGO = st.session_state['rgofinal']
+    else:
+        RGO = 50
 
     #if 'MM' in st.session_state:
     #    MM = st.session_state['MM']
