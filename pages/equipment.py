@@ -35,7 +35,7 @@ def app():
     qprodp = st.number_input('Capacidade da planta (STB/d):', 1, 1000000, oilprodp)
     st.session_state['oilprodp'] = qprodp
     
-    RGO = st.number_input('RGO:', 1, 50, rgofinal)
+    RGO = st.number_input('RGO:', 1, 200, 50)
     st.session_state['rgofinal'] = RGO
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
