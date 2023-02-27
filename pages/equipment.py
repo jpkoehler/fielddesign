@@ -47,6 +47,9 @@ def app():
 
     qprodp = st.number_input('Capacidade da planta (STB/d):', 1, 1000000, oilprodp)
     st.session_state['oilprodp'] = qprodp
+    
+    RGO = st.number_input('RGO:', 1, 50, rgofinal)
+    st.session_state['rgofinal'] = RGO
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
     Pexp = st.number_input('Pressão de exportação (bar):', 1, 1000, 300)
@@ -70,7 +73,7 @@ def app():
     #lavagem = st.checkbox("Lavagem de óleo")
 
     button1 = st.button('Dimensionar planta')
-    #dividir por 2 , como trem precisa ser feito
+
     if st.session_state.get('button1') != True:
         st.session_state['button1'] = button1
 
@@ -163,7 +166,7 @@ def app():
         Hflotador = Dtrifasico * 5
         ciclonumber = (math.ceil((qprodp * 0.006629)/5))/2
 
-        gasprod = oilprodp * RGO
+        gasprod = (oilprodp * RGO)/2
         nestag = math.ceil(math.log(Pexp/Psep)/math.log(4))
         razcomp = (Pexp / Psep) ** (1 / nestag)
 
