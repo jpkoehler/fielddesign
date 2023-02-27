@@ -30,25 +30,7 @@ def app():
     else:
         RGO = 50
 
-    #if 'MM' in st.session_state:
-    #    MM = st.session_state['MM']
-    #else:
-    #    MM = 25
 
-    #if 'ROl' in st.session_state:
-    #    ROl = st.session_state['ROl']
-    #else:
-    #    ROl = 800
-
-    #if 'Tc' in st.session_state:
-    #    Tc = st.session_state['Tc']
-    #else:
-    #    Tc = 252
-
-    #if 'Pc' in st.session_state:
-    #    Pc = st.session_state['Pc']
-    #else:
-    #    Pc = 47
 
     qprodp = st.number_input('Capacidade da planta (STB/d):', 1, 1000000, oilprodp)
     st.session_state['oilprodp'] = qprodp
