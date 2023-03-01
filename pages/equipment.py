@@ -96,6 +96,7 @@ def app():
         MM = (C1*16.04 + C2*30.07 + C3*44.1 + iC4*58.12 + nC4*58.12 + iC5*72.15 + nC5*72.15 + nC6*86.18 + nC7*100.21 + nC8*114.23 + n2*28.014 + co2*44.01 + h2s*34.1 + h2o*18.01)/100
         Tc = (C1*190.58 + C2*305.42 + C3*369.82 + iC4*408.14 + nC4*425.18 + iC5*692 + nC5*469.65 + nC6*507.43 + nC7*540.26 + nC8*568.83 + n2*126.10 + co2*304.19 + h2s*373.55 + h2o*647.13)/100
         Pc = (C1*46.04 + C2*48.80 + C3*42.49 + iC4*36.48 + nC4*37.97 + iC5*35.60 + nC5*33.69 + nC6*30.12 + nC7*27.36 + nC8*24.86 + n2*33.94 + co2*73.82 + h2s*90.08 + h2o*220.55)/100
+        Kheat = (C1*1.32 + C2*1.18 + C3*1.13 + iC4*1.19 + nC4*1.18 + iC5*1.08 + nC5*1.08 + nC6*1.06 + nC7*1.05 + nC8*1.05 + n2*1.40 + co2*1.28 + h2s*1.32 + h2o*1.33)/100
         ROl = 800
         tf = 10950  # dias
         i = 0.09  # anual
@@ -153,7 +154,16 @@ def app():
         Hflotador = Dtrifasico * 5
         ciclonumber = (math.ceil((qprodp * 0.006629)/5))/2
 
-        gasprod = (oilprodp * RGO)/2
+        gasprod = ((oilprodp * RGO)/2 ) * 0.0000018414    #dois trens idênticos de produção. m³/s
+        Tr = (313.15 / Tc)
+        Pr = (Psep / Pc)
+        B0 = 0.083 - (0.422 / (Tr ** 1.6))
+        B1 = 0.139 - (0.172 / (Tr ** 4.2))
+        w = -1 - math.log(Pr, 10)
+        Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
+        R = 8.314462  #m³ bar / K mol
+        
+        gasprodM = (Psep*gasprod)/(Z*R*313.15)   #vazão molar de gás, em mol/s. Calcula a vazão em cada equip
         nestag = math.ceil(math.log(Pexp/Psep)/math.log(4))
         razcomp = (Pexp / Psep) ** (1 / nestag)
 
@@ -179,7 +189,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414 #m³/s
+            qv = (Z*gasprodM*R*T1)/P1  #m³/s
             Aknock1 = qv / vmax
             Dknock1 = 1 * math.sqrt((4 * Aknock1) / math.pi)
 
@@ -190,11 +200,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td1 = T1 * ((Pcomp1 / Psep) ** (((K - 1) / K) * (1 / npoli)))
+            Td1 = T1 * ((Pcomp1 / Psep) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T1 + Td1) / 2) * (1 / Tc))
@@ -205,7 +214,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T1 * (((Pcomp1 / Psep) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T1 * (((Pcomp1 / Psep) ** ((Kheat - 1) / Kheat)) - 1)
             Pot1 = (Hisen * M) / (nisen * nmec * 3600)
 
 
@@ -216,6 +225,7 @@ def app():
             Thi = Td1  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Tci+Tco)/2))/Pcomp1  #m³/s
             mh = qv * ROg   # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -284,7 +294,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414  # m³/s
+            qv = gasprod  # m³/s
             Aknock2 = qv / vmax
             Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
 
@@ -295,11 +305,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
             M = 7562.99  # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((K - 1) / K) * (1 / npoli)))
+            Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T2 + Td2) / 2) * (1 / Tc))
@@ -310,7 +319,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((Kheat - 1) / Kheat)) - 1)
             Pot2 = (Hisen * M) / (nisen * nmec * 3600)
 
 
@@ -401,11 +410,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
             M = 7562.99  # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((K - 1) / K) * (1 / npoli)))
+            Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T3 + Td3) / 2) * (1 / Tc))
@@ -416,7 +424,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((Kheat - 1) / Kheat)) - 1)
             Pot3 = (Hisen * M) / (nisen * nmec * 3600)
 
 
@@ -509,11 +517,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
             M = 7562.99  # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td1 = T1 * ((Pcomp1 / Psep) ** (((K - 1) / K) * (1 / npoli)))
+            Td1 = T1 * ((Pcomp1 / Psep) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T1 + Td1) / 2) * (1 / Tc))
@@ -524,7 +531,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T1 * (((Pcomp1 / Psep) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T1 * (((Pcomp1 / Psep) ** ((Kheat - 1) / Kheat)) - 1)
             Pot1 = (Hisen * M) / (nisen * nmec * 3600)
 
 
@@ -613,11 +620,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
             M = 7562.99  # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((K - 1) / K) * (1 / npoli)))
+            Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T2 + Td2) / 2) * (1 / Tc))
@@ -628,7 +634,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((Kheat - 1) / Kheat)) - 1)
             Pot2 = (Hisen * M) / (nisen * nmec * 3600)
 
 
@@ -721,11 +727,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
             M = 7562.99  # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((K - 1) / K) * (1 / npoli)))
+            Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T3 + Td3) / 2) * (1 / Tc))
@@ -736,7 +741,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((Kheat - 1) / Kheat)) - 1)
             Pot3 = (Hisen * M) / (nisen * nmec * 3600)
 
             #st.write("T de descarga do compressor 3 é " + str("{:.0f}".format(Td3)) + " K.")
@@ -828,11 +833,10 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            K = 1.72  # Cp/Cv
             M = 7562.99  # Kmol/h AJUSTAR DEPOIS
 
             # Cálculo de Td
-            Td4 = T4 * ((Pcomp4 / Pcomp3) ** (((K - 1) / K) * (1 / npoli)))
+            Td4 = T4 * ((Pcomp4 / Pcomp3) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
 
             # Cálculo de Z
             Tr = (((T4 + Td4) / 2) * (1 / Tc))
@@ -843,7 +847,7 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
 
             # Cálculo de Hisen e Pot
-            Hisen = Z * R * (K / (K - 1)) * T3 * (((Pcomp4 / Pcomp3) ** ((K - 1) / K)) - 1)
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T3 * (((Pcomp4 / Pcomp3) ** ((Kheat - 1) / Kheat)) - 1)
             Pot4 = (Hisen * M) / (nisen * nmec * 3600)
 
 
