@@ -200,7 +200,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td1 = T1 * ((Pcomp1 / Psep) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -225,7 +225,7 @@ def app():
             Thi = Td1  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Tci+Tco)/2))/Pcomp1  #m³/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp1  #m³/s
             mh = qv * ROg   # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -294,7 +294,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod  # m³/s
+            qv = (Z*gasprodM*R*T2)/P2  #m³/s
             Aknock2 = qv / vmax
             Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
 
@@ -305,7 +305,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -330,6 +330,7 @@ def app():
             Thi = Td2  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp2  #m³/s
             mh = qv * ROg  # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -399,7 +400,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414  # m³/s
+            qv = (Z*gasprodM*R*T3)/P3  #m³/s
             Aknock3 = qv / vmax
             Dknock3 = 1 * math.sqrt((4 * Aknock3) / math.pi)
 
@@ -410,7 +411,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -435,6 +436,7 @@ def app():
             Thi = Td3  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp3  #m³/s
             mh = qv * ROg  # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -506,7 +508,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414 #m³/s
+            qv = (Z*gasprodM*R*T1)/P1  #m³/s
             Aknock1 = qv / vmax
             Dknock1 = 1 * math.sqrt((4 * Aknock1) / math.pi)
 
@@ -517,7 +519,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td1 = T1 * ((Pcomp1 / Psep) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -542,6 +544,7 @@ def app():
             Thi = Td1  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp1  #m³/s
             mh = qv * ROg   # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -609,7 +612,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414  # m³/s
+            qv = (Z*gasprodM*R*T2)/P2  #m³/s
             Aknock2 = qv / vmax
             Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
 
@@ -620,7 +623,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -645,6 +648,7 @@ def app():
             Thi = Td2  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp2  #m³/s
             mh = qv * ROg  # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -715,7 +719,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414  # m³/s
+            qv = (Z*gasprodM*R*T3)/P3  #m³/s
             Aknock3 = qv / vmax
             Dknock3 = 1 * math.sqrt((4 * Aknock3) / math.pi)
             #st.write("Área do knockout 3 é " + str("{:.2f}".format(Aknock3)) + " m².")
@@ -727,7 +731,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -753,6 +757,7 @@ def app():
             Thi = Td3  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp3  #m³/s
             mh = qv * ROg  # Kg/s
 
             Cpc = 4200  # J/KgCº
@@ -822,7 +827,7 @@ def app():
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
-            qv = gasprod * 0.0000018414  # m³/s
+            qv = (Z*gasprodM*R*T4)/P4  #m³/s
             Aknock4 = qv / vmax
             Dknock4 = 1 * math.sqrt((4 * Aknock4) / math.pi)
 
@@ -833,7 +838,7 @@ def app():
             npoli = 0.75
             nmec = 0.8
             R = 8.314  # KJ/KmolK
-            M = 7562.99  # Kmol/h AJUSTAR DEPOIS
+            M = gasprodM/3.6   # Kmol/h 
 
             # Cálculo de Td
             Td4 = T4 * ((Pcomp4 / Pcomp3) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
@@ -858,6 +863,7 @@ def app():
             Thi = Td4  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp4  #m³/s
             mh = qv * ROg  # Kg/s
 
             Cpc = 4200  # J/KgCº
