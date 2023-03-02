@@ -164,20 +164,108 @@ def app():
             Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
             return Z
         
+        def Knockoutcalc(T,P):
+            Kint = 0.080
+            R = 0.082205  # L atm/K mol
+
+            # Cálculo de Z
+            Z = Zcalc(T, P)
+
+            # Cálculo de vmax
+            ROg = ((P / 1.013) * MM) / (Z * R * T)
+            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
+
+            # Cálculo de Área e Diâmetro
+            qv = (Z*gasprodM*R*T)/P  #m³/s
+            Aknock = qv / vmax
+            Dknock = 1 * math.sqrt((4 * Aknock) / math.pi)
+            return Aknock, Dknock
+        
+        def Compressorcalc(T,P):
+            Pcomp = P * razcomp
+            nisen = 0.7
+            npoli = 0.75
+            nmec = 0.8
+            R = 8.314  # KJ/KmolK
+            M = gasprodM/3.6   # Kmol/h 
+
+            # Cálculo de Td
+            Td = T * ((Pcomp / P) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
+
+            # Cálculo de Z
+            Z = Zcalc(((T+Td)/2), P)
+
+            # Cálculo de Hisen e Pot
+            Hisen = Z * R * (Kheat / (Kheat - 1)) * T * (((Pcomp / P) ** ((Kheat - 1) / Kheat)) - 1)
+            Pot = (Hisen * M) / (nisen * nmec * 3600)
+            return Pot, Td, Pcomp
+        
+        def Resfriadorcalc(Td,Pcomp):
+            Tci = 293.15  # K
+            Tco = 303.15  # K
+            Thi = Td  # K
+            Tho = 313.15  # K
+            mc = None  # Kg/s
+            Z = Zcalc(Td, Pcomp)
+            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp  #m³/s
+            mh = qv * ROg   # Kg/s
+
+            Cpc = 4200  # J/KgCº
+            Cph = 2352.2  # J/KgCº
+            ROc = 1000  # Kg/m³
+            MIc = 0.001  # Pas
+            Kc = 0.6  # W/mK
+
+            K = 20  # W/mK
+            Hext = 400  # W/m²K
+            Rfin = 0.0001  # m²K/W
+            Rfext = 0.0006  # m²K/W
+            Dext = 0.75  # in
+            Thk = 1.65  # mm
+            Q = None
+
+            # Cálculo do calor requerido e Tco/mc
+            if Tco == None:
+                Q = mh * Cph * (Thi - Tho)
+                Tco = (Q / (mc * Cpc)) + Tci
+            elif mc == None:
+                Q = mh * Cph * (Thi - Tho)
+                mc = (Q / (Cpc * (Tco - Tci)))
+
+            # Cálculo DeltaTLM
+            DT1 = Thi - Tco
+            DT2 = Tho - Tci
+            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
+
+            # Cálculo do coeficiente do Hin
+            Dext = Dext * 0.0254
+            Din = Dext - Thk * 0.001
+            At = (math.pi * (Din ** 2) / 4)
+            Vc = (mc / ROc) / At
+            Rec = (Din * Vc * ROc) / MIc
+            Prc = (Cpc * MIc) / Kc
+            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
+            Hin = (Nuc * Kc) / Din
+
+            # Cálculo do U
+            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + ((Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
+                        1 / Hext))
+
+            # Cálculo da área de Troca Térmica
+            Atroc = (Q / (DTLM * U)) * 1.1
+            return Atroc
+        
+        
+        
                 
         
         
 
         gasprod = ((oilprodp * RGO)/2 ) * 0.0000018414    #dois trens idênticos de produção. m³/s
-        Tr = (313.15 / Tc)
-        Pr = (Psep / Pc)
-        B0 = 0.083 - (0.422 / (Tr ** 1.6))
-        B1 = 0.139 - (0.172 / (Tr ** 4.2))
-        w = -1 - math.log(Pr, 10)
-        Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
+        Z = Zcalc(313.15, Psep)
         R = 8.314462  #m³ bar / K mol
         
-        gasprodM = (Psep*gasprod)/(Z*R*313.15)   #vazão molar de gás, em mol/s. Calcula a vazão em cada equip
+        gasprodM = (Psep*gasprod)/(Z*R*313.15)   #vazão molar de gás, em mol/s. Calcula a vazão vol em cada equip
         nestag = math.ceil(math.log(Pexp/Psep)/math.log(4))
         razcomp = (Pexp / Psep) ** (1 / nestag)
 
@@ -191,12 +279,7 @@ def app():
             R = 0.082205  # L atm/K mol
 
             # Cálculo de Z
-            Tr = (T1 / Tc)
-            Pr = (P1 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
+            Z = Zcalc(T1, P1)
 
             # Cálculo de vmax
             ROg = ((P1 / 1.013) * MM) / (Z * R * T1)
