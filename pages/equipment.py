@@ -40,20 +40,20 @@ def app():
 
     Psep = st.number_input('Pressão do separador (bar):', 1, 100, 10)
     Pexp = st.number_input('Pressão de exportação (bar):', 1, 1000, 300)
-    C1 = st.number_input('Fração molar de C1(%):', 0, 100, 0)
-    C2 = st.number_input('Fração molar de C2(%):', 0, 100, 0)
-    C3 = st.number_input('Fração molar de C3(%):', 0, 100, 0)
-    iC4 = st.number_input('Fração molar de i-C4(%):', 0, 100, 0)
+    C1 = st.number_input('Fração molar de C1(%):', 0, 100, 65)
+    C2 = st.number_input('Fração molar de C2(%):', 0, 100, 8)
+    C3 = st.number_input('Fração molar de C3(%):', 0, 100, 6)
+    iC4 = st.number_input('Fração molar de i-C4(%):', 0, 100, 3)
     nC4 = st.number_input('Fração molar de n-C4(%):', 0, 100, 0)
-    iC5 = st.number_input('Fração molar de i-C5(%):', 0, 100, 0)
+    iC5 = st.number_input('Fração molar de i-C5(%):', 0, 100, 1)
     nC5 = st.number_input('Fração molar de n-C5(%):', 0, 100, 0)
     nC6 = st.number_input('Fração molar de n-C6(%):', 0, 100, 0)
     nC7 = st.number_input('Fração molar de n-C7(%):', 0, 100, 0)
     nC8 = st.number_input('Fração molar de n-C8(%):', 0, 100, 0)
     n2 = st.number_input('Fração molar de N2(%):', 0, 100, 0)
-    co2 = st.number_input('Fração molar de CO2(%):', 0, 100, 0)
+    co2 = st.number_input('Fração molar de CO2(%):', 0, 100, 10)
     h2s = st.number_input('Fração molar de H2S(%):', 0, 100, 0)
-    h2o = st.number_input('Fração molar de H2O(%):', 0, 100, 0)
+    h2o = st.number_input('Fração molar de H2O(%):', 0, 100, 7)
     #st.write("Processos adicionais:")
     #CO2 = st.checkbox("CO2")
     #H2S = st.checkbox("H2S")
@@ -273,313 +273,36 @@ def app():
 
             #Knockout1
             T1 = 313.15  # K
-            P1 = Psep
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Z = Zcalc(T1, P1)
-
-            # Cálculo de vmax
-            ROg = ((P1 / 1.013) * MM) / (Z * R * T1)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T1)/P1  #m³/s
-            Aknock1 = qv / vmax
-            Dknock1 = 1 * math.sqrt((4 * Aknock1) / math.pi)
-
+            P1 = Psep          
+            Aknock1, Dknock1 = Knockoutcalc(T1,P1)
 
             #Compressor1
-            Pcomp1 = Psep * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td1 = T1 * ((Pcomp1 / Psep) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T1 + Td1) / 2) * (1 / Tc))
-            Pr = (((Psep + Pcomp1) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T1 * (((Pcomp1 / Psep) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot1 = (Hisen * M) / (nisen * nmec * 3600)
-
-
+            Pot1, Td1, Pcomp1 = Compressorcalc(T1,P1)
 
             #Resfriador1
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td1  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp1  #m³/s
-            mh = qv * ROg   # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q = mh * Cph * (Thi - Tho)
-                Tco = (Q / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q = mh * Cph * (Thi - Tho)
-                mc = (Q / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + ((Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                        1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc1 = (Q / (DTLM * U)) * 1.1
-
-
+           Atroc1 = Resfriadorcalc(Td1,Pcomp1)
 
             # Knockout2
             T2 = 313.15  # K
-            P2 = Pcomp1
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Tr = (T2 / Tc)
-            Pr = (P2 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de vmax
-            ROg = ((P2 / 1.013) * MM) / (Z * R * T2)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T2)/P2  #m³/s
-            Aknock2 = qv / vmax
-            Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
-
+            P2 = Comp1          
+            Aknock2, Dknock2 = Knockoutcalc(T2,P2)
 
             # Compressor2
-            Pcomp2 = P2 * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T2 + Td2) / 2) * (1 / Tc))
-            Pr = (((Pcomp1 + Pcomp2) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot2 = (Hisen * M) / (nisen * nmec * 3600)
-
-
+            Pot2, Td2, Pcomp2 = Compressorcalc(T2,P2)
 
             # Resfriador2
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td2  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp2  #m³/s
-            mh = qv * ROg  # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q2 = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q2 = mh * Cph * (Thi - Tho)
-                Tco = (Q2 / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q2 = mh * Cph * (Thi - Tho)
-                mc = (Q2 / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + (
-                        (Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                             1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc2 = (Q2 / (DTLM * U)) * 1.1
-
-
+            Atroc2 = Resfriadorcalc(Td2,Pcomp2)
 
             # Knockout3
             T3 = 313.15  # K
             P3 = Pcomp2
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Tr = (T3 / Tc)
-            Pr = (P3 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de vmax
-            ROg = ((P3 / 1.013) * MM) / (Z * R * T3)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T3)/P3  #m³/s
-            Aknock3 = qv / vmax
-            Dknock3 = 1 * math.sqrt((4 * Aknock3) / math.pi)
-
+            Aknock3, Dknock3 = Knockoutcalc(T3,P3)
 
             # Compressor3
-            Pcomp3 = P3 * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T3 + Td3) / 2) * (1 / Tc))
-            Pr = (((Pcomp3 + Pcomp2) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot3 = (Hisen * M) / (nisen * nmec * 3600)
-
-
+            Pot3, Td3, Pcomp3 = Compressorcalc(T3,P3)
 
             # Resfriador3
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td3  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp3  #m³/s
-            mh = qv * ROg  # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q3 = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q3 = mh * Cph * (Thi - Tho)
-                Tco = (Q3 / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q3 = mh * Cph * (Thi - Tho)
-                mc = (Q3 / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + (
-                    (Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                             1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc3 = (Q3 / (DTLM * U)) * 1.1
+            Atroc3 = Resfriadorcalc(Td3,Pcomp3)
 
 
 
@@ -587,426 +310,47 @@ def app():
 
             #Knockout1
             T1 = 313.15  # K
-            P1 = Psep
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Tr = (T1 / Tc)
-            Pr = (P1 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de vmax
-            ROg = ((P1 / 1.013) * MM) / (Z * R * T1)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T1)/P1  #m³/s
-            Aknock1 = qv / vmax
-            Dknock1 = 1 * math.sqrt((4 * Aknock1) / math.pi)
-
+            P1 = Psep          
+            Aknock1, Dknock1 = Knockoutcalc(T1,P1)
 
             #Compressor1
-            Pcomp1 = Psep * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td1 = T1 * ((Pcomp1 / Psep) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T1 + Td1) / 2) * (1 / Tc))
-            Pr = (((Psep + Pcomp1) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T1 * (((Pcomp1 / Psep) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot1 = (Hisen * M) / (nisen * nmec * 3600)
-
-
+            Pot1, Td1, Pcomp1 = Compressorcalc(T1,P1)
 
             #Resfriador1
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td1  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp1  #m³/s
-            mh = qv * ROg   # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q = mh * Cph * (Thi - Tho)
-                Tco = (Q / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q = mh * Cph * (Thi - Tho)
-                mc = (Q / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + ((Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                        1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc1 = (Q / (DTLM * U)) * 1.1
-
+           Atroc1 = Resfriadorcalc(Td1,Pcomp1)
 
             # Knockout2
             T2 = 313.15  # K
-            P2 = Pcomp1
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Tr = (T2 / Tc)
-            Pr = (P2 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de vmax
-            ROg = ((P2 / 1.013) * MM) / (Z * R * T2)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T2)/P2  #m³/s
-            Aknock2 = qv / vmax
-            Dknock2 = 1 * math.sqrt((4 * Aknock2) / math.pi)
-
+            P2 = Comp1          
+            Aknock2, Dknock2 = Knockoutcalc(T2,P2)
 
             # Compressor2
-            Pcomp2 = P2 * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td2 = T2 * ((Pcomp2 / Pcomp1) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T2 + Td2) / 2) * (1 / Tc))
-            Pr = (((Pcomp1 + Pcomp2) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T2 * (((Pcomp2 / Pcomp1) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot2 = (Hisen * M) / (nisen * nmec * 3600)
-
-
+            Pot2, Td2, Pcomp2 = Compressorcalc(T2,P2)
 
             # Resfriador2
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td2  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp2  #m³/s
-            mh = qv * ROg  # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q2 = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q2 = mh * Cph * (Thi - Tho)
-                Tco = (Q2 / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q2 = mh * Cph * (Thi - Tho)
-                mc = (Q2 / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + (
-                        (Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                             1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc2 = (Q2 / (DTLM * U)) * 1.1
-
-            #st.write("Área de troca térmica do resfriador 2 é " + str("{:.0f}".format(Atroc2)) + " m².")
-            #st.write("A carga térmica do resfriador 2 é " + str("{:.0f}".format(Q2)) + " W.")
+            Atroc2 = Resfriadorcalc(Td2,Pcomp2)
 
             # Knockout3
             T3 = 313.15  # K
             P3 = Pcomp2
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Tr = (T3 / Tc)
-            Pr = (P3 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de vmax
-            ROg = ((P3 / 1.013) * MM) / (Z * R * T3)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T3)/P3  #m³/s
-            Aknock3 = qv / vmax
-            Dknock3 = 1 * math.sqrt((4 * Aknock3) / math.pi)
-            #st.write("Área do knockout 3 é " + str("{:.2f}".format(Aknock3)) + " m².")
-            #st.write("Diâmetro do Knockout 3 é " + str("{:.2f}".format(Dknock3)) + " m.")
+            Aknock3, Dknock3 = Knockoutcalc(T3,P3)
 
             # Compressor3
-            Pcomp3 = P3 * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td3 = T3 * ((Pcomp3 / Pcomp2) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T3 + Td3) / 2) * (1 / Tc))
-            Pr = (((Pcomp3 + Pcomp2) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T3 * (((Pcomp3 / Pcomp2) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot3 = (Hisen * M) / (nisen * nmec * 3600)
-
-            #st.write("T de descarga do compressor 3 é " + str("{:.0f}".format(Td3)) + " K.")
-            #st.write("Potência do compressor 3 é " + str("{:.0f}".format(Pot3)) + " KW.")
+            Pot3, Td3, Pcomp3 = Compressorcalc(T3,P3)
 
             # Resfriador3
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td3  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp3  #m³/s
-            mh = qv * ROg  # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q3 = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q3 = mh * Cph * (Thi - Tho)
-                Tco = (Q3 / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q3 = mh * Cph * (Thi - Tho)
-                mc = (Q3 / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + (
-                    (Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                             1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc3 = (Q3 / (DTLM * U)) * 1.1
-
-
-
+            Atroc3 = Resfriadorcalc(Td3,Pcomp3)
+            
             # Knockout4
             T4 = 313.15  # K
             P4 = Pcomp3
-
-            Kint = 0.080
-            R = 0.082205  # L atm/K mol
-
-            # Cálculo de Z
-            Tr = (T4 / Tc)
-            Pr = (P4 / Pc)
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de vmax
-            ROg = ((P4 / 1.013) * MM) / (Z * R * T4)
-            vmax = Kint * math.sqrt((ROl - ROg) / ROg)
-
-            # Cálculo de Área e Diâmetro
-            qv = (Z*gasprodM*R*T4)/P4  #m³/s
-            Aknock4 = qv / vmax
-            Dknock4 = 1 * math.sqrt((4 * Aknock4) / math.pi)
-
+            Aknock4, Dknock4 = Knockoutcalc(T4,P4)
 
             # Compressor4
-            Pcomp4 = P4 * razcomp
-            nisen = 0.7
-            npoli = 0.75
-            nmec = 0.8
-            R = 8.314  # KJ/KmolK
-            M = gasprodM/3.6   # Kmol/h 
-
-            # Cálculo de Td
-            Td4 = T4 * ((Pcomp4 / Pcomp3) ** (((Kheat - 1) / Kheat) * (1 / npoli)))
-
-            # Cálculo de Z
-            Tr = (((T4 + Td4) / 2) * (1 / Tc))
-            Pr = (((Pcomp4 + Pcomp3) / 2) * (1 / Pc))
-            B0 = 0.083 - (0.422 / (Tr ** 1.6))
-            B1 = 0.139 - (0.172 / (Tr ** 4.2))
-            w = -1 - math.log(Pr, 10)
-            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
-
-            # Cálculo de Hisen e Pot
-            Hisen = Z * R * (Kheat / (Kheat - 1)) * T3 * (((Pcomp4 / Pcomp3) ** ((Kheat - 1) / Kheat)) - 1)
-            Pot4 = (Hisen * M) / (nisen * nmec * 3600)
-
-
+            Pot4, Td4, Pcomp4 = Compressorcalc(T4,P4)
 
             # Resfriador4
-            Tci = 293.15  # K
-            Tco = 303.15  # K
-            Thi = Td4  # K
-            Tho = 313.15  # K
-            mc = None  # Kg/s
-            qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp4  #m³/s
-            mh = qv * ROg  # Kg/s
-
-            Cpc = 4200  # J/KgCº
-            Cph = 2352.2  # J/KgCº
-            ROc = 1000  # Kg/m³
-            MIc = 0.001  # Pas
-            Kc = 0.6  # W/mK
-
-            K = 20  # W/mK
-            Hext = 400  # W/m²K
-            Rfin = 0.0001  # m²K/W
-            Rfext = 0.0006  # m²K/W
-            Dext = 0.75  # in
-            Thk = 1.65  # mm
-            Q4 = None
-
-            # Cálculo do calor requerido e Tco/mc
-            if Tco == None:
-                Q4 = mh * Cph * (Thi - Tho)
-                Tco = (Q4 / (mc * Cpc)) + Tci
-            elif mc == None:
-                Q4 = mh * Cph * (Thi - Tho)
-                mc = (Q4 / (Cpc * (Tco - Tci)))
-
-            # Cálculo DeltaTLM
-            DT1 = Thi - Tco
-            DT2 = Tho - Tci
-            DTLM = ((DT1 - DT2) / (math.log(DT1 / DT2)))
-
-            # Cálculo do coeficiente do Hin
-            Dext = Dext * 0.0254
-            Din = Dext - Thk * 0.001
-            At = (math.pi * (Din ** 2) / 4)
-            Vc = (mc / ROc) / At
-            Rec = (Din * Vc * ROc) / MIc
-            Prc = (Cpc * MIc) / Kc
-            Nuc = 0.023 * (Rec ** 0.8) * (Prc ** 0.3)
-            Hin = (Nuc * Kc) / Din
-
-            # Cálculo do U
-            U = 1 / ((Dext / (Hin * Din)) + ((Rfin * Dext) / Din) + (
-                    (Dext * math.log(Dext / Din)) / (2 * K)) + Rfext + (
-                             1 / Hext))
-
-            # Cálculo da área de Troca Térmica
-            Atroc4 = (Q4 / (DTLM * U)) * 1.1
+            Atroc4 = Resfriadorcalc(Td4,Pcomp4)
 
 
         Ttrifasico =30
