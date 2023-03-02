@@ -153,6 +153,20 @@ def app():
         Leletro = Deletro * 4
         Hflotador = Dtrifasico * 5
         ciclonumber = (math.ceil((qprodp * 0.006629)/5))/2
+        
+        #Functions
+        def Zcalc(T,P):
+            Tr = (T / Tc)
+            Pr = (P / Pc)
+            B0 = 0.083 - (0.422 / (Tr ** 1.6))
+            B1 = 0.139 - (0.172 / (Tr ** 4.2))
+            w = -1 - math.log(Pr, 10)
+            Z = 1 + B0 * (Pr / Tr) + w * B1 * (Pr / Tr)
+            return Z
+        
+                
+        
+        
 
         gasprod = ((oilprodp * RGO)/2 ) * 0.0000018414    #dois trens idênticos de produção. m³/s
         Tr = (313.15 / Tc)
