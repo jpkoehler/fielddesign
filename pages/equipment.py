@@ -361,21 +361,21 @@ def app():
             [["Vaso de Knockout 1", str("{:.2f}".format(P1)), str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(P2)),str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
              ["Vaso de Knockout 3", str("{:.2f}".format(P3)), str("{:.2f}".format(Aknock3)), str("{:.2f}".format(Dknock3))]],
             columns=['Equipamento','Pressão Nominal (bar)', 'Área (m²)', 'Diâmetro (m)'])
-        dataknock.index += 1 
+        #dataknock.index += 1 
         st.table(dataknock)
 
         datacomp = pd.DataFrame(
             [["Compressor 1", str("{:.2f}".format(Pot1))], ["Compressor 2", str("{:.2f}".format(Pot2))],
              ["Compressor 3", str("{:.2f}".format(Pot3))]],
             columns=['Equipamento', 'Potência (KW)'])
-        datacomp.index += 1
+        #datacomp.index += 1
         st.table(datacomp)
 
         dataresf = pd.DataFrame(
             [["Resfriador 1", str("{:.2f}".format(Q/1e6)), str("{:.2f}".format(Atroc1))], ["Resfriador 2", str("{:.2f}".format(Q2/1e6)), str("{:.2f}".format(Atroc2))],
              ["Resfriador 3", str("{:.2f}".format(Q3/1e6)), str("{:.2f}".format(Atroc3))]],
             columns=['Equipamento',"Carga Térmica (MW)", 'Área de Troca Térmica (m²)'])
-        dataresf.index += 1
+        #dataresf.index += 1
         st.table(dataresf)
 
 
