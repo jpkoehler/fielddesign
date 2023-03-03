@@ -357,75 +357,26 @@ def app():
         Tbifasico = Teletro
         Tflotador = 25
 
-        #datasep = pd.DataFrame(
-        #   [["Separador Trifásico", str("{:.2f}".format(Ltrifasico)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Ttrifasico))],
-        #    ["Separador Bifásico", str("{:.2f}".format(Lbifasico)), str("{:.2f}".format(Dbifasico)),str("{:.0f}".format(Tbifasico))],
-        #    ["Tratador Eletrostático", str("{:.2f}".format(Leletro)), str("{:.2f}".format(Deletro)),str("{:.0f}".format(Teletro))],
-        #    ["Flotador", str("{:.2f}".format(Hflotador)), str("{:.2f}".format(Dtrifasico)),str("{:.0f}".format(Tflotador))]],
-        #   columns=['Equipamento', 'Comprimento (m)', 'Diâmetro (m)','Temperatura (°C)'])
-        #st.table(datasep)
-
         dataknock = pd.DataFrame(
             [["Vaso de Knockout 1", str("{:.2f}".format(P1)), str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(P2)),str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
              ["Vaso de Knockout 3", str("{:.2f}".format(P3)), str("{:.2f}".format(Aknock3)), str("{:.2f}".format(Dknock3))]],
             columns=['Equipamento','Pressão Nominal (bar)', 'Área (m²)', 'Diâmetro (m)'])
+        dataknock.index += 1 
         st.table(dataknock)
 
         datacomp = pd.DataFrame(
             [["Compressor 1", str("{:.2f}".format(Pot1))], ["Compressor 2", str("{:.2f}".format(Pot2))],
              ["Compressor 3", str("{:.2f}".format(Pot3))]],
             columns=['Equipamento', 'Potência (KW)'])
+        datacomp.index += 1
         st.table(datacomp)
 
         dataresf = pd.DataFrame(
             [["Resfriador 1", str("{:.2f}".format(Q/1e6)), str("{:.2f}".format(Atroc1))], ["Resfriador 2", str("{:.2f}".format(Q2/1e6)), str("{:.2f}".format(Atroc2))],
              ["Resfriador 3", str("{:.2f}".format(Q3/1e6)), str("{:.2f}".format(Atroc3))]],
             columns=['Equipamento',"Carga Térmica (MW)", 'Área de Troca Térmica (m²)'])
+        dataresf.index += 1
         st.table(dataresf)
-
-        #dataciclo = pd.DataFrame(
-        #     [["Hidrociclone do Separador Trifásico", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))],
-        #      ["Hidrociclone do Separador Eletrostático", str("{:.2f}".format(42)), str("{:.2f}".format(2)),str("{:.0f}".format(ciclonumber))]],
-        #     columns=['Equipamento', "Diâmetro (m)", 'Comprimento (m)',"Quantidade"])
-        #st.table(dataciclo)
-
-        #if (CO2 == True):
-        #    flux = Image.open('fluxograma3.png')
-        #    st.image(flux)
-        #else:
-        #    flux = Image.open('fluxograma.png')
-        #    st.image(flux)
-
-
-
-
-        #if st.button('Abrir Separador de Teste'):
-        #    flux = Image.open('fluxogramapfd-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Cooler de Gás Separado'):
-        #    flux = Image.open('fluxogramapfd-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Estágios de Compressão'):
-        #    flux = Image.open('compstages-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Controle de Compressor'):
-        #    flux = Image.open('compcontrol-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Compressão Principal'):
-        #    flux = Image.open('maingascomp-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Compressor de Exportação'):
-        #    flux = Image.open('exporgascomp-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Coalescedor'):
-        #    flux = Image.open('coalescent-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Sistema de Tratamento de Gás'):
-        #    flux = Image.open('gasdesid-1.png')
-        #    st.image(flux)
-        #if st.button('Abrir Hidrociclone'):
-        #    flux = Image.open('hidrociclone-1.png')
-        #    st.image(flux)
 
 
 
