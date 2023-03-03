@@ -4,7 +4,7 @@ import utils as utl
 
 # Custom imports
 from multipage import MultiPage
-from pages import reservoir_flow, oilproperties, equipment, layout, wells, subsea, results, risk, SMS, economic # import your pages here
+from pages import equipment # import your pages here
 
 # Create an instance of the app
 app = MultiPage()
