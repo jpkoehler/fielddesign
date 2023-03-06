@@ -23,7 +23,7 @@ def app():
     if 'oilprodp' in st.session_state:
         oilprodp = st.session_state['oilprodp']
     else:
-        oilprodp = 90000
+        oilprodp = 100000
         
     if 'rgofinal' in st.session_state:
         RGO = st.session_state['rgofinal']
@@ -156,6 +156,8 @@ def app():
         
         #Functions
         def Zcalc(T,P):
+            T = float(T)
+            P = float(P)
             Tr = (T / Tc)
             Pr = (P / Pc)
             B0 = 0.083 - (0.422 / (Tr ** 1.6))
@@ -165,23 +167,29 @@ def app():
             return Z
         
         def Knockoutcalc(T,P):
+            T = float(T)
+            P = float(P)
             Kint = 0.080
-            R = 0.082205  # L atm/K mol
+            R = 0.082205  #L atm/K mol
+            ROl = 800 #kg/m³
 
             # Cálculo de Z
-            Z = Zcalc(T, P)
+            Z = Zcalc(T,P)
 
             # Cálculo de vmax
-            ROg = ((P / 1.013) * MM) / (Z * R * T)
+            ROg = (((P/1.013) * MM) / (Z * R * T))   #kg/m³
             vmax = Kint * math.sqrt((ROl - ROg) / ROg)
 
             # Cálculo de Área e Diâmetro
+            R = 8.314462e-5  # m³ bar / K mol
             qv = (Z*gasprodM*R*T)/P  #m³/s
             Aknock = qv / vmax
             Dknock = 1 * math.sqrt((4 * Aknock) / math.pi)
-            return Aknock, Dknock
+            return Aknock, Dknock, ROg
         
         def Compressorcalc(T,P):
+            T = float(T)
+            P = float(P)
             Pcomp = P * razcomp
             nisen = 0.7
             npoli = 0.75
@@ -200,12 +208,15 @@ def app():
             Pot = (Hisen * M) / (nisen * nmec * 3600)
             return Pot, Td, Pcomp
         
-        def Resfriadorcalc(Td,Pcomp):
+        def Resfriadorcalc(Td,Pcomp,ROg):
+            Td = float(Td)
+            Pcomp = float(Pcomp)
             Tci = 293.15  # K
             Tco = 303.15  # K
             Thi = Td  # K
             Tho = 313.15  # K
             mc = None  # Kg/s
+            R = 8.314462e-5  # m³ bar / K mol
             Z = Zcalc(Td, Pcomp)
             qv = (Z*gasprodM*R*((Thi+Tho)/2))/Pcomp  #m³/s
             mh = qv * ROg   # Kg/s
@@ -253,17 +264,11 @@ def app():
 
             # Cálculo da área de Troca Térmica
             Atroc = (Q / (DTLM * U)) * 1.1
-            return Atroc
-        
-        
-        
-                
-        
-        
+            return Atroc, Q
 
-        gasprod = ((oilprodp * RGO)/2 ) * 0.0000018414    #dois trens idênticos de produção. m³/s
+        gasprod = ((qprodp * RGO)/2) * 0.0000018414    #dois trens idênticos de produção. m³/s
         Z = Zcalc(313.15, Psep)
-        R = 8.314462  #m³ bar / K mol
+        R = 8.314462e-5  #m³ bar / K mol
         
         gasprodM = (Psep*gasprod)/(Z*R*313.15)   #vazão molar de gás, em mol/s. Calcula a vazão vol em cada equip
         nestag = math.ceil(math.log(Pexp/Psep)/math.log(4))
@@ -273,36 +278,42 @@ def app():
 
             #Knockout1
             T1 = 313.15  # K
-            P1 = Psep          
-            Aknock1, Dknock1 = Knockoutcalc(T1,P1)
+            P1 = Psep    # bar
+            Aknock1, Dknock1, ROg = Knockoutcalc(T1,P1)
 
             #Compressor1
             Pot1, Td1, Pcomp1 = Compressorcalc(T1,P1)
 
             #Resfriador1
-           Atroc1 = Resfriadorcalc(Td1,Pcomp1)
+            Atroc1, Q1 = Resfriadorcalc(Td1,Pcomp1,ROg)
+            Atroc1 = float(Atroc1)
+            Q1 = float(Q1)
 
             # Knockout2
             T2 = 313.15  # K
-            P2 = Comp1          
-            Aknock2, Dknock2 = Knockoutcalc(T2,P2)
+            P2 = Pcomp1
+            Aknock2, Dknock2, ROg  = Knockoutcalc(T2,P2)
 
             # Compressor2
             Pot2, Td2, Pcomp2 = Compressorcalc(T2,P2)
 
             # Resfriador2
-            Atroc2 = Resfriadorcalc(Td2,Pcomp2)
+            Atroc2, Q2 = Resfriadorcalc(Td2,Pcomp2,ROg)
+            Atroc2 = float(Atroc2)
+            Q2 = float(Q2)
 
             # Knockout3
             T3 = 313.15  # K
             P3 = Pcomp2
-            Aknock3, Dknock3 = Knockoutcalc(T3,P3)
+            Aknock3, Dknock3, ROg  = Knockoutcalc(T3,P3)
 
             # Compressor3
             Pot3, Td3, Pcomp3 = Compressorcalc(T3,P3)
 
             # Resfriador3
-            Atroc3 = Resfriadorcalc(Td3,Pcomp3)
+            Atroc3, Q3 = Resfriadorcalc(Td3,Pcomp3,ROg)
+            Atroc3 = float(Atroc3)
+            Q3 = float(Q3)
 
 
 
@@ -311,46 +322,46 @@ def app():
             #Knockout1
             T1 = 313.15  # K
             P1 = Psep          
-            Aknock1, Dknock1 = Knockoutcalc(T1,P1)
+            Aknock1, Dknock1, ROg  = Knockoutcalc(T1,P1)
 
             #Compressor1
             Pot1, Td1, Pcomp1 = Compressorcalc(T1,P1)
 
             #Resfriador1
-           Atroc1 = Resfriadorcalc(Td1,Pcomp1)
+            Atroc1, Q1 = Resfriadorcalc(Td1,Pcomp1)
 
             # Knockout2
             T2 = 313.15  # K
-            P2 = Comp1          
-            Aknock2, Dknock2 = Knockoutcalc(T2,P2)
+            P2 = Pcomp1
+            Aknock2, Dknock2, ROg  = Knockoutcalc(T2,P2)
 
             # Compressor2
             Pot2, Td2, Pcomp2 = Compressorcalc(T2,P2)
 
             # Resfriador2
-            Atroc2 = Resfriadorcalc(Td2,Pcomp2)
+            Atroc2, Q2 = Resfriadorcalc(Td2,Pcomp2)
 
             # Knockout3
             T3 = 313.15  # K
             P3 = Pcomp2
-            Aknock3, Dknock3 = Knockoutcalc(T3,P3)
+            Aknock3, Dknock3, ROg  = Knockoutcalc(T3,P3)
 
             # Compressor3
             Pot3, Td3, Pcomp3 = Compressorcalc(T3,P3)
 
             # Resfriador3
-            Atroc3 = Resfriadorcalc(Td3,Pcomp3)
+            Atroc3, Q3 = Resfriadorcalc(Td3,Pcomp3)
             
             # Knockout4
             T4 = 313.15  # K
             P4 = Pcomp3
-            Aknock4, Dknock4 = Knockoutcalc(T4,P4)
+            Aknock4, Dknock4, ROg  = Knockoutcalc(T4,P4)
 
             # Compressor4
             Pot4, Td4, Pcomp4 = Compressorcalc(T4,P4)
 
             # Resfriador4
-            Atroc4 = Resfriadorcalc(Td4,Pcomp4)
+            Atroc4, Q4 = Resfriadorcalc(Td4,Pcomp4)
 
 
         Ttrifasico =30
@@ -361,21 +372,21 @@ def app():
             [["Vaso de Knockout 1", str("{:.2f}".format(P1)), str("{:.2f}".format(Aknock1)), str("{:.2f}".format(Dknock1))], ["Vaso de Knockout 2", str("{:.2f}".format(P2)),str("{:.2f}".format(Aknock2)), str("{:.2f}".format(Dknock2))],
              ["Vaso de Knockout 3", str("{:.2f}".format(P3)), str("{:.2f}".format(Aknock3)), str("{:.2f}".format(Dknock3))]],
             columns=['Equipamento','Pressão Nominal (bar)', 'Área (m²)', 'Diâmetro (m)'])
-        #dataknock.index += 1 
+        dataknock.index += 1
         st.table(dataknock)
 
         datacomp = pd.DataFrame(
             [["Compressor 1", str("{:.2f}".format(Pot1))], ["Compressor 2", str("{:.2f}".format(Pot2))],
              ["Compressor 3", str("{:.2f}".format(Pot3))]],
             columns=['Equipamento', 'Potência (KW)'])
-        #datacomp.index += 1
+        datacomp.index += 1
         st.table(datacomp)
 
         dataresf = pd.DataFrame(
-            [["Resfriador 1", str("{:.2f}".format(Q/1e6)), str("{:.2f}".format(Atroc1))], ["Resfriador 2", str("{:.2f}".format(Q2/1e6)), str("{:.2f}".format(Atroc2))],
+            [["Resfriador 1", str("{:.2f}".format(Q1/1e6)), str("{:.2f}".format(Atroc1))], ["Resfriador 2", str("{:.2f}".format(Q2/1e6)), str("{:.2f}".format(Atroc2))],
              ["Resfriador 3", str("{:.2f}".format(Q3/1e6)), str("{:.2f}".format(Atroc3))]],
             columns=['Equipamento',"Carga Térmica (MW)", 'Área de Troca Térmica (m²)'])
-        #dataresf.index += 1
+        dataresf.index += 1
         st.table(dataresf)
 
 
