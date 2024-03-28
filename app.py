@@ -14,16 +14,16 @@ app = MultiPage()
 utl.local_css("style.css")
 
 # Add all your applications (pages) here
-# app.add_page("Características do Projeto", oilproperties.app)
-# app.add_page("Reservatório e Escoamento", reservoir_flow.app)
-# app.add_page("Subsea e Naval", subsea.app)
-# app.add_page("Poços", wells.app)
+app.add_page("Características do Projeto", oilproperties.app)
+app.add_page("Reservatório e Escoamento", reservoir_flow.app)
+app.add_page("Subsea e Naval", subsea.app)
+app.add_page("Poços", wells.app)
 app.add_page("Planta de Processo - Equipamentos", equipment.app)
-# app.add_page("Planta de Processo - Arranjo", layout.app)
-# app.add_page("Análise de Risco", risk.app)
-# app.add_page("Análise Econômica", economic.app)
-# app.add_page("SMS", SMS.app)
-# app.add_page("Resultados", results.app)
+app.add_page("Planta de Processo - Arranjo", layout.app)
+app.add_page("Análise de Risco", risk.app)
+app.add_page("Análise Econômica", economic.app)
+app.add_page("SMS", SMS.app)
+app.add_page("Resultados", results.app)
 
 
 
